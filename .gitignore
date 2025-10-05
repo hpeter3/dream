@@ -1,0 +1,54 @@
+.qmake.stash
+obj/
+Makefile
+moc/
+ui/
+data/
+dream
+qrc_icons.cpp
+build
+debian/.debhelper
+debian/debhelper-build-stamp
+debian/dream.substvars
+debian/dream
+debian/files
+dream.pro.user
+*.kdev4
+*.orig
+.Dream.ini.swp
+..gitignore.kate-swp
+Dream.ini
+macx/
+windows/
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
