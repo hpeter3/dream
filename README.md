@@ -13,7 +13,10 @@ sudo apt-get install build-essential
 ```sh
 sudo apt-get install libgps-dev libsndfile-dev libpcap-dev libqwt-qt5-dev libfftw3-dev libfaad-dev libfaac-dev libpulse-dev libhamlib-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools qtwebengine5-dev libqt5svg5-dev libfdk-aac-dev libspeexdsp-dev speex libspeexdsp1 libsoapysdr-dev
 ```
-
+FOR DEBIAN 12 ONLY (fixes the immediate crash in `dream -t`):
+```sh
+sudo apt-get install pipewire
+```
 # Compiling
 
 ```sh
