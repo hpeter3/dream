@@ -3,7 +3,7 @@
 
 An experimental Qt6 port of the Dream AM/DRM Receiver program for GNU/Linux.
 Source code of the original project: https://sourceforge.net/p/drm/code/HEAD/tree/
-Currently this program is only tested on Debian 13. At the time of writing (October 5th 2025) this software is still in its original Qt5 state with only minor compile time fixes (these fixes are marked as "DEBUG2025" in the codebase).
+Currently this program is only tested on Debian 12 and Debian 13. At the time of writing (October 5th 2025) this software is still in its original Qt5 state with only minor compile time fixes (these fixes are marked as "DEBUG2025" in the codebase).
 # Prerequisites 
 Before doing any of these, please enable the `contrib` and `non-free` repositories in your Debian 13 install. (Usually at /etc/apt/sources.list)
 ```sh
@@ -15,7 +15,7 @@ sudo apt-get install libgps-dev libsndfile-dev libpcap-dev libqwt-qt5-dev libfft
 ```
 FOR DEBIAN 12 ONLY (fixes the immediate crash in `dream -t`):
 ```sh
-sudo apt-get install pipewire
+sudo apt-get install pipewire pipewire-pulse wireplumber
 ```
 # Compiling
 
@@ -25,6 +25,12 @@ make
 ```
 # Running the program
 
+Receiver:
 ```sh
 ./dream
+```
+
+Transmitter:
+```sh
+./dream -t
 ```
