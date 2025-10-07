@@ -7,6 +7,8 @@ data/
 dream
 qrc_icons.cpp
 build
+build/
+dream-qt6.kdev4
 debian/.debhelper
 debian/debhelper-build-stamp
 debian/dream.substvars
