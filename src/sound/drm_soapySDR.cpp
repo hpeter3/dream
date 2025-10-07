@@ -195,7 +195,10 @@ void CSoapySDRIn::Enumerate(std::vector<std::string>& names, std::vector<std::st
         }
         descriptions.push_back(ss.str());
     }
-    defaultDevice = names[0];
+    //defaultDevice = names[0];
+    //fixes the major crash in https://codeberg.org/halmaz/dream-qt6/issues/1
+    //we need to find a better solution than hardcoding this string
+    defaultDevice = "alsa_output.pci-0000_00_1b.0.analog-stereo";
 }
 
 std::string	CSoapySDRIn::GetDev()
