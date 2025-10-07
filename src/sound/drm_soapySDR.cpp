@@ -178,6 +178,10 @@ void CSoapySDRIn::Enumerate(std::vector<std::string>& names, std::vector<std::st
 {
     // 0. enumerate devices (list all devices' information)
     SoapySDR::KwargsList results = SoapySDR::Device::enumerate();
+    if(results.size() == 0) {
+        cout << endl << "------BUG!------"<< endl << "Couldn't get any devices..." << endl <<"----------------"<<endl;
+        return;
+    }
     SoapySDR::Kwargs::iterator it;
 
     names.clear();
@@ -195,10 +199,10 @@ void CSoapySDRIn::Enumerate(std::vector<std::string>& names, std::vector<std::st
         }
         descriptions.push_back(ss.str());
     }
-    //defaultDevice = names[0];
+    defaultDevice = names[0];
     //fixes the major crash in https://codeberg.org/halmaz/dream-qt6/issues/1
     //we need to find a better solution than hardcoding this string
-    defaultDevice = "alsa_output.pci-0000_00_1b.0.analog-stereo";
+    //defaultDevice = "alsa_output.pci-0000_00_1b.0.analog-stereo";
 }
 
 std::string	CSoapySDRIn::GetDev()
