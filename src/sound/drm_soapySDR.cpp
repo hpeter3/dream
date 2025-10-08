@@ -178,7 +178,7 @@ void CSoapySDRIn::Enumerate(std::vector<std::string>& names, std::vector<std::st
 {
     // 0. enumerate devices (list all devices' information)
     SoapySDR::KwargsList results = SoapySDR::Device::enumerate();
-    if(results.size() == 0) {
+    if(names.size() == 0) {
         cout << endl << "------BUG!------"<< endl << "Couldn't get any devices..." << endl <<"----------------"<<endl;
         return;
     }
