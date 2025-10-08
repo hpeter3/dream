@@ -788,7 +788,11 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
     QString qStrTime;
     if (gps.set&TIME_SET)
     {
-        struct tm * p_ts;
+        //qStrTime = "UTC: ?";
+        //QString qStrSat;
+        //struct tm * p_ts;
+        //DEBUG2025
+        //invalid cast from timespec_t (which is a struct) to time_t (which is a long int)
         time_t tt = time_t(gps.fix.time);
         p_ts = gmtime(&tt);
         QChar fill('0');
