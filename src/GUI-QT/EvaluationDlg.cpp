@@ -794,7 +794,7 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
         //struct tm * p_ts;
         //DEBUG2025
         //invalid cast from timespec_t (which is a struct) to time_t (which is a long int)
-        /*time_t tt = time_t(gps.fix.time);
+        time_t tt = time_t(gps.fix.time);
         p_ts = gmtime(&tt);
         QChar fill('0');
         qStrTime = QString("UTC: %1/%2/%3 %4:%5:%6  ")

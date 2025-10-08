@@ -69,7 +69,8 @@ public:
         case CAudioParam::AC_NONE: return true;
         case CAudioParam::AC_AAC:  return bCanEncodeAAC;
         case CAudioParam::AC_OPUS: return bCanEncodeOPUS;
-        case CAudioParam::AC_xHE_AAC: return false;
+        case CAudioParam::AC_MPEGAAC: return bCanEncodeAAC; /* test */
+        case CAudioParam::AC_xHE_AAC: return bCanEncodeAAC;
         case CAudioParam::AC_RESERVED: return false;
         }
         return false;

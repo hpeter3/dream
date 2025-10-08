@@ -329,7 +329,7 @@ void StationsDlg::OnTimer()
 	struct tm* gmtCur = gmtime(&ltime);
 
 	/* Generate time in format "UTC 12:00" */
-	QString strUTCTime = QString().sprintf("%02d:%02d UTC",
+    QString strUTCTime = QString().asprintf("%02d:%02d UTC",
 		gmtCur->tm_hour, gmtCur->tm_min);
 
 	/* Only apply if time label does not show the correct time */
@@ -485,7 +485,7 @@ void StationsDlg::LoadScheduleView()
 		else
 			strPower.setNum(rPower);
 
-		QString strTimes = QString().sprintf("%04d-%04d", station.StartTime(), station.StopTime());
+        QString strTimes = QString().asprintf("%04d-%04d", station.StartTime(), station.StopTime());
 
 		/* Generate new list station with all necessary column entries */
 		QTreeWidgetItem* item = new CaseInsensitiveTreeWidgetItem(ListViewStations);
