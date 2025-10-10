@@ -2,7 +2,7 @@
 #define PACKETSOCKETHTTP_H
 
 #include <QObject>
-#include <QNetworkAccessManager>
+#include <QtNetwork/QNetworkAccessManager>
 #include "PacketInOut.h"
 
 class CPacketSocketHTTP : public QObject, public CPacketSocket

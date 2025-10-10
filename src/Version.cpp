@@ -28,10 +28,10 @@
 #include "Version.h"
 #include "GlobalDefinitions.h"
 
-const char dream_manufacturer[] = "drea";
+const char dream_manufacturer[] = "dream";
 #ifdef QT_CORE_LIB
 #if QT_VERSION >= 0x060000
-const char dream_implementation[ = "Q6";]
+const char dream_implementation[] = "Q6";
 # elif QT_VERSION >= 0x050000
 const char dream_implementation[] = "Q5";
 # elif QT_VERSION >= 0x040000
