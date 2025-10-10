@@ -113,8 +113,7 @@ void CSoapySDRIn::ApplyConfigString()
     std::string strJoiner="";
     std::stringstream ssConfig;
 
-    for (SoapySDR::ArgInfo info : argInfoList)
-    {
+    for (const SoapySDR::ArgInfo &info : argInfoList) {
         ssConfig <<strJoiner<<info.key << "=" <<pDevice->readSetting(info.key);
         strJoiner = ",";
     }
