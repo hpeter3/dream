@@ -732,10 +732,9 @@ void systemevalDlg::OnTimer()
             /* Add UTC offset if available */
             if (Parameters.bValidUTCOffsetAndSense)
                 strFACInfo += QString(" %1%2%3%4")
-                    .arg(tr("UTC"))
-                    .arg(Parameters.iUTCSense ? "-" : "+")
-                    .arg(Parameters.iUTCOff / 2, 0, 10)
-                    .arg(Parameters.iUTCOff & 1 ? ".5" : "");
+                                  .arg(tr("UTC"), Parameters.iUTCSense ? "-" : "+")
+                                  .arg(Parameters.iUTCOff / 2, 0, 10)
+                                  .arg(Parameters.iUTCOff & 1 ? ".5" : "");
         }
 
         //FACTimeDateL->setText(tr("Received time - date:")); /* Label */

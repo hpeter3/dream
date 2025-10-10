@@ -181,7 +181,7 @@ void CreateDirectories(const QString& strFilename)
         if (i < 0)
             break;
         const QString strDirName = strFilename.left(i);
-        if (!strDirName.isEmpty() && !QFileInfo(strDirName).exists())
+        if (!strDirName.isEmpty() && !QFileInfo::exists(strDirName))
             QDir().mkdir(strDirName);
     }
 }
