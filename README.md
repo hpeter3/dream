@@ -17,11 +17,19 @@ FOR DEBIAN 12 ONLY (fixes the immediate crash in `dream -t`):
 ```sh
 sudo apt-get install pipewire pipewire-pulse wireplumber
 ```
+# Prerequisites (Qt6)
+```sh
+sudo apt install cmake cmake-qt-gui
+sudo apt-get install libqt6svg6*
+sudo apt-get install qt6-base-dev qt6-base-dev-tools qt6-networkauth-dev qt6-declarative-dev qt6-declarative-dev-tools libqt6network6 qt6-webengine-dev qt6-5compat-dev libqt6core5compat6-dev 
+```
+
 # Compiling
 
 ```sh
-qmake
-make
+cmake -DQT_DIR=/usr/lib/cmake/Qt6 CMakeLists.txt 
+make clean
+make -j8 
 ```
 # Running the program
 
