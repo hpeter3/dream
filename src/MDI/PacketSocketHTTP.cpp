@@ -2,8 +2,8 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include <QNetworkReply>
-#include <QAuthenticator>
+#include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QAuthenticator>
 
 CPacketSocketHTTP::CPacketSocketHTTP(): bGetInFlight(false)
 {
