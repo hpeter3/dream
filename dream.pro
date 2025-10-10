@@ -35,7 +35,7 @@ console {
 }
 qtconsole {
     QT -= gui
-    QT += xml network
+    QT += xml network core5compat
     UI_MESSAGE = console mode
     SOURCES += src/main-Qt/main.cpp
 	unix:!cross_compile {
@@ -47,14 +47,9 @@ qtconsole {
 contains(QT,gui) {
     UI_MESSAGE = GUI mode
     RESOURCES = src/GUI-QT/res/icons.qrc
-    QT += network xml widgets
+    QT += network xml widgets core5compat
     INCLUDEPATH += src/GUI-QT
     VPATH += src/GUI-QT
-    win32 {
-        RC_FILE = windows/dream.rc
-        RC_INCLUDEPATH = $$PWD/src/GUI-QT/res
-    }
-    macx:RC_FILE = src/GUI-QT/res/macicons.icns
     CONFIG += qwt
     UI_DIR = ui
     MOC_DIR = moc
@@ -139,48 +134,10 @@ unix {
     message(building on $$UNAME for this platform)
   }
 }
-macx {
-    contains(QT, core) {
-        QT += webenginewidgets
-        !sound {
-            QT += multimedia
-            CONFIG += sound
-        }
-    }
-    QT_CONFIG -= no-pkg-config
-    PKG_CONFIG = /usr/local/bin/pkg-config
-    INCLUDEPATH += /usr/local/include
-    LIBS += -L/usr/local/lib
-    QMAKE_LFLAGS += -F/usr/local/lib
-    LIBS += -framework CoreFoundation -framework CoreServices -lpcap
-    LIBS += -framework CoreAudio -framework AudioToolbox -framework AudioUnit
-    DEFINES += HAVE_LIBPCAP
-    packagesExist(sndfile) {
-        CONFIG += sndfile
-    }
-    packagesExist(hamlib) {
-        CONFIG += hamlib
-    }
-    packagesExist(speex) {
-        CONFIG += libspeexdsp
-    }
-    packagesExist(libgps) {
-        CONFIG += gps
-    }
-    packagesExist(fdk-aac) {
-        CONFIG += fdk-aac
-    }
-}
 linux-* {
   LIBS += -ldl -lrt
 }
-android {
-    CONFIG += sound fdk-aac
-    SOURCES += src/android/platform_util.cpp src/android/soundin.cpp src/android/soundout.cpp
-    HEADERS += src/android/platform_util.h src/android/soundin.h src/android/soundout.h
-    QT -= webkitwidgets
-    QT += svg multimedia
-}
+
 unix {
     target.path = /usr/bin
     documentation.path = /usr/share/man/man1
@@ -266,68 +223,7 @@ unix:!cross_compile {
        CONFIG += soapysdr
     }
 }
-win32:cross_compile {
-  message(win32 cross compile)
-  CONFIG += mxe
-  target.path = $$absolute_path(../..)/usr/$$replace(QMAKE_CC,-gcc,)/bin
-  INSTALLS += target
-  message($$target.path)
-}
-win32 {
-  CONFIG += fdk-aac
-  LIBS += -lwpcap -lpacket -lmincore
-  DEFINES += HAVE_SETUPAPI HAVE_LIBZ _CRT_SECURE_NO_WARNINGS HAVE_LIBZ HAVE_LIBPCAP
-  SOURCES += src/windows/Pacer.cpp src/windows/platform_util.cpp
-  HEADERS += src/windows/platform_util.h
-  LIBS += -lsetupapi
-  contains(QT,multimedia) {
-	CONFIG += sound
-  }
-  else {
-    HEADERS += src/windows/Sound.h
-    SOURCES += src/windows/Sound.cpp
-    LIBS += -lwinmm
-    message("with mmsystem")
-	CONFIG += sound
-  }
-  win32-g++ {
-	DEFINES += HAVE_STDINT_H
-	LIBS += -lz -lfftw3
-  }
-  else {
-	DEFINES += NOMINMAX
-	QMAKE_LFLAGS_RELEASE += /NODEFAULTLIB:libcmt.lib
-	QMAKE_LFLAGS_DEBUG += /NODEFAULTLIB:libcmtd.lib
-	QMAKE_LFLAGS_DEBUG += /NODEFAULTLIB:libcmt.lib
-	LIBS += -lzlib -llibfftw3-3
-  }
-  mxe {
-    message('MXE')
-    !minimal:CONFIG += sndfile hamlib opus
-    minimal {
-        HEADERS += src/windows/Sound.h
-        SOURCES += src/windows/Sound.cpp
-        LIBS += -lwinmm
-    }
-    CONFIG += speexdsp sound
-    #!console:QT += multimedia
-  }
-  else {
-    exists($$PWD/include/speex/speex_preprocess.h) {
-      CONFIG += speexdsp
-    }
-    exists($$PWD/include/hamlib/rig.h) {
-      CONFIG += hamlib
-    }
-    exists($$PWD/include/sndfile.h) {
-        CONFIG += sndfile
-    }
-    exists($$PWD/include/opus/opus.h) {
-        CONFIG += opus
-    }
 
-  }
-}
 fdk-aac {
      DEFINES += HAVE_LIBFDK_AAC HAVE_USAC
      LIBS += -lfdk-aac
@@ -338,21 +234,11 @@ fdk-aac {
 opus {
     DEFINES += HAVE_LIBOPUS USE_OPUS_LIBRARY
     unix:LIBS += -lopus
-    win32 {
-        CONFIG(debug, debug|release) {
-            LIBS += -lopusd
-        }
-        CONFIG(release, debug|release) {
-            LIBS += -lopus
-        }
-    }
      message("with opus")
 }
 sndfile {
      DEFINES += HAVE_LIBSNDFILE
-     unix:LIBS += -lsndfile
-     win32:mxe:LIBS += -lsndfile -lvorbisenc -lvorbis -lFLAC -logg -lm
-     win32:!mxe:LIBS += -llibsndfile-1
+     unix:LIBS += -lsndfile1
      message("with libsndfile")
 }
 speexdsp {
@@ -367,16 +253,7 @@ gps {
 }
 hamlib {
      DEFINES += HAVE_LIBHAMLIB
-     macx:LIBS += -framework IOKit
      unix:LIBS += -lhamlib
-     win32 {
-       msvc* {
-         LIBS += -llibhamlib-2
-       }
-       else {
-         LIBS += -lhamlib -lusb-1.0
-       }
-     }
      HEADERS += src/util/Hamlib.h
      SOURCES += src/util/Hamlib.cpp
      contains(QT,core) {
@@ -393,19 +270,6 @@ hamlib {
 qwt {
     message("with Qwt")
     QT += svg
-    macx {
-        INCLUDEPATH += /Library/Frameworks/qwt.framework/Headers
-        LIBS += -framework qwt
-    }
-    win32 {
-        INCLUDEPATH += $$PWD/include/qwt
-        CONFIG(debug, debug|release) {
-            LIBS += -lqwtd
-        }
-        CONFIG(release, debug|release) {
-            LIBS += -lqwt
-        }
-    }
     unix!macx {
         # unix | win release
         LIBS += -lqwt-qt5
@@ -441,13 +305,7 @@ pulseaudio {
     HEADERS += src/sound/drm_pulseaudio.h
     SOURCES += src/sound/drm_pulseaudio.cpp
     unix {
-        macx {
-            INCLUDEPATH += /usr/local/Cellar/pulseaudio/12.2/include
-            LIBS += -L/usr/local/Cellar/pulseaudio/12.2/lib -lpulse
-        }
-        else {
-            PKGCONFIG += libpulse
-        }
+        PKGCONFIG += libpulse
     }
     else {
         LIBS += -lpulse
