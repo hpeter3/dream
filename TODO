@@ -1,1 +1,17 @@
-lots of things
+> #### Short-term plans:
+>
+> - Fixing CMake
+> - Preparing headers etc. for Qt6
+
+> #### Mid-term plans:
+>
+> - Barebones port to Qt6
+> - Implementing upstream changes in source files that use RtAudio (mainly soapySDR)
+> - Implementing misc upstream changes in drm_pulseaudio, drm_portaudio and drm_soapySDR
+> - Fixing quirks in the Dream transmitter
+
+> #### Long-term goals:
+>
+> - Complete port to Qt6
+> - Rewriting the audio stack, use Pipewire
+> - Implementing VVC (https://www.drm.org/drm-newsletter-september-2025/ "Video on DRM")
