@@ -136,6 +136,8 @@ typedef unsigned __int32 uint32_t;
 # endif
 typedef signed __int64 int64_t;
 typedef unsigned __int64 uint64_t;
+#endif
+/*
 #else
 typedef signed char int8_t;
 typedef unsigned char uint8_t;
@@ -153,7 +155,7 @@ typedef unsigned long uint32_t;
 #endif
 typedef signed long long int64_t;
 typedef unsigned long long uint64_t;
-#endif
+#endif*/
 
 /* Define type-specific information */
 #define SIZEOF__BYTE					8

@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 project(dream VERSION 1.0 LANGUAGES C CXX)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Gui)
-find_package(Qt6 OPTIONAL_COMPONENTS Core5Compat Network Svg Widgets Xml)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Core5Compat Network Svg Xml)
 find_package(Qt5Network REQUIRED)
-
+find_library(QWT_LIB NAMES qwt qwt-qt5 qwt-qt6 qwt6 HINTS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu REQUIRED)
+find_path(QWT_INCLUDE_DIR NAMES qwt_dial.h HINTS /usr/include /usr/local/include /usr/include/qwt /usr/local/qwt-6.3.0/include REQUIRED)
 qt_standard_project_setup()
 
 qt_add_executable(dream WIN32 MACOSX_BUNDLE
@@ -151,12 +155,14 @@ qt_add_executable(dream WIN32 MACOSX_BUNDLE
     src/util/Vector.h
 )
 target_include_directories(dream PRIVATE
-    include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    src/resample
+    ${QWT_INCLUDE_DIR}
 )
 
 target_compile_definitions(dream PRIVATE
     EXECUTABLE_NAME=dream
-    QT_DISABLE_DEPRECATED_UP_TO=0x060700
+    QT_DISABLE_DEPRECATED_UP_TO=0x060000
 )
 
 target_link_directories(dream PRIVATE
@@ -166,6 +172,14 @@ target_link_directories(dream PRIVATE
 target_link_libraries(dream PRIVATE
     Qt::Core
     Qt::Gui
+    Qt6::Network
+    speexdsp
+    SoapySDR
+    qwt-qt5
+    libqwt-qt5-6
+    libqwt-qt5-dev
+    ${QWT_LIB}
+
 )
 
 if(console)
@@ -247,7 +261,7 @@ if(QT___contains___gui)
     )
 
     target_include_directories(dream PRIVATE
-        src/GUI-QT
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI-QT
     )
 
     target_link_libraries(dream PRIVATE
