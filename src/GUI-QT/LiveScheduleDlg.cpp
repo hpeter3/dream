@@ -26,6 +26,7 @@
 \******************************************************************************/
 
 #include "LiveScheduleDlg.h"
+#include <QActionGroup>
 #include <QFile>
 #include <QDir>
 #include <QFileDialog>
