@@ -45,7 +45,7 @@ public:
 
     bool		Init(int iSampleRate, int iNewBufferSize, bool bNewBlocking);
     void			ReInit();
-    bool		Read(CVector<short>& psData);
+    bool		Read(CVector<short>& psData, CParameter& Parameters);
     bool		Write(CVector<short>& psData);
     void			Close();
 
@@ -91,7 +91,7 @@ public:
 
     virtual bool	Init(int iSampleRate, int iNewBufferSize, bool bNewBlocking);
     virtual void		Close();
-    virtual bool	Read(CVector<short>& psData);
+    virtual bool	Read(CVector<short>& psData, CParameter& Parameters) override;
 
 protected:
 

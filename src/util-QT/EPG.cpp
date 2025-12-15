@@ -40,6 +40,7 @@
 #ifdef _WIN32
 # include <windows.h>
 #endif
+#include <QRegularExpression>
 
 const
 EPG::gl
@@ -1469,10 +1470,11 @@ EPG::loadChannels (const QString & fileName)
 
 time_t EPG::parseTime(const QString & time)
 {
-    if (time=="")
+    if (time.isEmpty())
         return 0; // invalid
-    QRegExp q("[-T:+Z]");
-    QStringList sl = time.split(q);
+
+QStringList sl = time.split(QRegularExpression("[-T:+Z]"));
+
 #ifdef _WIN32
     SYSTEMTIME st;
     st.wYear = 1970;

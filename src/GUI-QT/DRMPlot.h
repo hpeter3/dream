@@ -61,7 +61,8 @@
 #include <qwt_scale_draw.h>
 #include <qwt_symbol.h>
 #if QWT_VERSION >= 0x060000
-# include <qwt_picker_machine.h>
+#include <qwt_picker_machine.h>
+#include <qwt_text.h>
 #endif
 
 /* Other includes */
