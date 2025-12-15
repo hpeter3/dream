@@ -29,7 +29,7 @@
  *
 \******************************************************************************/
 
-
+#pragma once
 #include "ui_AMMainWindow.h"
 #include "ui_AMSSDlgbase.h"
 #include "CWindow.h"
