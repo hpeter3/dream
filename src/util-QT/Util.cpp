@@ -34,14 +34,16 @@
 #include <QFileInfo>
 #include <QCoreApplication>
 #include "../Parameter.h"
+#include <QRegularExpression>
+
 
 /* Ensure that the given filename is secure */
 QString VerifyFilename(QString filename)
 {
-    filename.replace(QRegExp("/"), "_"); /* replace unix-like path separator with '_' */
+    filename.replace(QRegularExpression("/"), "_");/* replace unix-like path separator with '_' */
 #ifdef _WIN32
-    filename.replace(QRegExp("\\\\"), "_"); /* replace windows path separator with '_' */
-    filename.replace(QRegExp(":"), "_"); /* replace ':' with '_' */
+    filename.replace(QRegularExpression("\\\\"), "_"); /* replace windows path separator with '_' */
+    filename.replace(QRegularExpression(":"), "_"); /* replace ':' with '_' */
 #endif
     return filename;
 }
@@ -52,12 +54,13 @@ QString VerifyHtmlPath(QString path)
     if (path == "..")
         return "_";
 #ifdef _WIN32
-    path.replace(QRegExp("\\\\"), "_"); /* replace windows path separator with '_' */
-    path.replace(QRegExp(":"), "_"); /* replace ':' with '_' */
+    path.replace(QRegularExpression("\\\\"), "_"); /* replace windows path separator with '_' */
+    path.replace(QRegularExpression(":"), "_"); /* replace ':' with '_' */
 #endif
-    path.replace(QRegExp("^\\.\\./"), "_/"); /* replace '../' at the beginning with '_/' */
-    path.replace(QRegExp("/\\.\\.$"), "/_"); /* replace '/..' at the end with '/_' */
-    path.replace(QRegExp("/\\.\\./"), "/_/"); /* replace '/../' with '/_/' */
+    path.replace(QRegularExpression("^\\.\\./"), "_/");
+    path.replace(QRegularExpression("/\\.\\.$"), "/_");
+    path.replace(QRegularExpression("/\\.\\./"), "/_/");
+
     return path;
 }
 
@@ -71,10 +74,10 @@ QString UrlEncodePath(QString url)
     if (path.size() == 0 || path.at(0) != QChar('/'))
         path.insert(0, QChar('/'));
     /* Replace multiple '/' by single '/' */
-    path.replace(QRegExp("/{1,}"), "/");
+    path.replace(QRegularExpression("/{1,}"), "/");
     /* Replace all occurrence of '/./' with '/' */
     while (path.indexOf("/./") != -1)
-        path.replace(QRegExp("/\\./"), "/");
+        path.replace(QRegularExpression("/\\./"), "/");
     /* The Actual percent encoding */
     path = QString(QUrl(path, QUrl::TolerantMode).toEncoded(
         QUrl::RemoveScheme | QUrl::RemoveAuthority |
@@ -102,7 +105,7 @@ QString& Linkify(QString& text)
         if (posHTTP != -1 && posHTTP < i)
             posHTTP = text.indexOf("http://", i, Qt::CaseInsensitive);
         if (posMAIL != -1 && posMAIL < i)
-            posMAIL = text.indexOf(QRegExp("\\b[0-9a-z._-]+@[0-9a-z.-]+\\.[a-z]{2,4}\\b", Qt::CaseInsensitive), i);
+            posMAIL = text.indexOf(QRegularExpression("\\b[0-9a-z._-]+@[0-9a-z.-]+\\.[a-z]{2,4}\\b", QRegularExpression::CaseInsensitiveOption), i);
         if (posMAIL>=0 && (posMAIL<=posWWW || posWWW<0) && (posMAIL<posHTTP || posHTTP<0))
             posBegin = posMAIL;
         else if (posWWW>=0 && (posWWW<posHTTP || posHTTP<0))
@@ -128,7 +131,7 @@ QString& Linkify(QString& text)
                 }
             }
             const int rawLinkSize = posEnd-posBegin;
-            QStringRef rawLink(&text, posBegin, rawLinkSize);
+            QStringView rawLink(text.constData() + posBegin, rawLinkSize);
             QString newLink;
             if (posBegin == posMAIL)
                 newLink = "<a href=\"mailto:%1\">%1</a>";

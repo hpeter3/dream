@@ -313,31 +313,32 @@ CPaCommon::Close()
     }
 }
 
-bool
-CPaCommon::Read(CVector < short >&psData)
+bool CPaCommon::Read(CVector<short>& psData, CParameter& Parameters)
 {
     if (device_changed)
         ReInit();
 
-    if (stream==nullptr)
+    if (stream == nullptr)
         return true;
 
     size_t bytes = psData.Size() * sizeof(short);
 
-    while (PaUtil_GetRingBufferReadAvailable(&ringBuffer)<int(bytes))
+    while (PaUtil_GetRingBufferReadAvailable(&ringBuffer) < int(bytes))
     {
-        //cout << "Read: want " << bytes << " avail " << PaUtil_GetRingBufferReadAvailable(&ringBuffer) << endl;
         Pa_Sleep(10);
     }
 
     PaUtil_ReadRingBuffer(&ringBuffer, &psData[0], bytes);
-    if (xruns==0)
+
+    if (xruns == 0)
         return false;
     else
-        cout << "overrun" << endl;
+        std::cout << "overrun" << std::endl;
+
     xruns = 0;
     return true;
 }
+
 
 bool
 CPaCommon::Write(CVector < short >&psData)
@@ -385,10 +386,10 @@ CPaIn::Init(int iSampleRate, int iNewBufferSize, bool bNewBlocking)
     return hw.Init(iSampleRate, iNewBufferSize, bNewBlocking);
 }
 
-bool
-CPaIn::Read(CVector<short>& psData)
+bool CPaIn::Read(CVector<short>& psData, CParameter& Parameters)
 {
-    return hw.Read(psData);
+    // Forward the call to the PortAudio backend
+    return hw.Read(psData, Parameters);
 }
 
 void

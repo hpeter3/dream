@@ -372,12 +372,27 @@ CFileMenu::CFileMenu(CTRx& ntrx, QMainWindow* parent,
     {
         QString openFile(tr("&Open File..."));
         QString closeFile(tr("&Close File"));
-        actionOpenFile = addAction(openFile, this, SLOT(OnOpenFile()), QKeySequence(tr("Alt+O")));
-        actionCloseFile = addAction(closeFile, this, SLOT(OnCloseFile()), QKeySequence(tr("Alt+C")));
+
+        // Create actions
+        actionOpenFile = addAction(openFile);
+        actionCloseFile = addAction(closeFile);
+
+        // Set shortcuts
+        actionOpenFile->setShortcut(QKeySequence(tr("Alt+O")));
+        actionCloseFile->setShortcut(QKeySequence(tr("Alt+C")));
+
+        // Connect signals
+        connect(actionOpenFile, &QAction::triggered, this, &CFileMenu::OnOpenFile);
+        connect(actionCloseFile, &QAction::triggered, this, &CFileMenu::OnCloseFile);
+
         addSeparator();
     }
-    addAction(tr("&Exit"), parent, SLOT(close()), QKeySequence(tr("Alt+X")));
+    QAction *exitAction = addAction(tr("&Exit"));
+    exitAction->setShortcut(QKeySequence(tr("Alt+X")));
+    connect(exitAction, &QAction::triggered, parent, &QWidget::close);
+
     parent->menuBar()->insertMenu(menuInsertBefore->menuAction(), this);
+
 }
 
 

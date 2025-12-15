@@ -40,6 +40,7 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include <cmath>
+#include <QActionGroup>
 
 /* Implementation *************************************************************/
 #ifdef HAVE_LIBHAMLIB
@@ -104,32 +105,53 @@ bReInitOnFrequencyChange(false)
 	ListViewStations->headerItem()->setTextAlignment(3, Qt::AlignRight | Qt::AlignVCenter);
 	ListViewStations->headerItem()->setTextAlignment(4, Qt::AlignRight | Qt::AlignVCenter);
 
-	previewMapper = new QSignalMapper(this);
-	previewGroup = new QActionGroup(this);
-	showMapper = new QSignalMapper(this);
-	showGroup = new QActionGroup(this);
-	showGroup->addAction(actionShowOnlyActiveStations);
-	showMapper->setMapping(actionShowOnlyActiveStations, 0);
-	showGroup->addAction(actionShowAllStations);
-	showMapper->setMapping(actionShowAllStations, 1);
-	connect(actionClose, SIGNAL(triggered()), SLOT(close()));
-	connect(actionShowAllStations, SIGNAL(triggered()), showMapper, SLOT(map()));
-	connect(actionShowOnlyActiveStations, SIGNAL(triggered()), showMapper, SLOT(map()));
-	connect(showMapper, SIGNAL(mapped(int)), this, SLOT(OnShowStationsMenu(int)));
-	previewGroup->addAction(actionDisabled);
-	previewMapper->setMapping(actionDisabled, 0);
-	previewGroup->addAction(action5minutes);
-	previewMapper->setMapping(action5minutes, NUM_SECONDS_PREV_5MIN);
-	previewGroup->addAction(action15minutes);
-	previewMapper->setMapping(action15minutes, NUM_SECONDS_PREV_15MIN);
-	previewGroup->addAction(action30minutes);
-	previewMapper->setMapping(action30minutes, NUM_SECONDS_PREV_30MIN);
-	connect(actionDisabled, SIGNAL(triggered()), previewMapper, SLOT(map()));
-	connect(action5minutes, SIGNAL(triggered()), previewMapper, SLOT(map()));
-	connect(action15minutes, SIGNAL(triggered()), previewMapper, SLOT(map()));
-	connect(action30minutes, SIGNAL(triggered()), previewMapper, SLOT(map()));
-	connect(previewMapper, SIGNAL(mapped(int)), this, SLOT(OnShowPreviewMenu(int)));
-	connect(ListViewStations->header(), SIGNAL(sectionClicked(int)), this, SLOT(OnHeaderClicked(int)));
+    // --- SHOW GROUP (replaces showMapper + QSignalMapper) ---
+    showGroup = new QActionGroup(this);
+    showGroup->addAction(actionShowOnlyActiveStations);
+    showGroup->addAction(actionShowAllStations);
+
+    // When "Only Active Stations" is selected
+    connect(actionShowOnlyActiveStations, &QAction::triggered, this, [this]() {
+        OnShowStationsMenu(0);
+    });
+
+    // When "All Stations" is selected
+    connect(actionShowAllStations, &QAction::triggered, this, [this]() {
+        OnShowStationsMenu(1);
+    });
+
+
+    // --- PREVIEW GROUP (replaces previewMapper + QSignalMapper) ---
+    previewGroup = new QActionGroup(this);
+
+    previewGroup->addAction(actionDisabled);
+    connect(actionDisabled, &QAction::triggered, this, [this]() {
+        OnShowPreviewMenu(0);
+    });
+
+    previewGroup->addAction(action5minutes);
+    connect(action5minutes, &QAction::triggered, this, [this]() {
+        OnShowPreviewMenu(NUM_SECONDS_PREV_5MIN);
+    });
+
+    previewGroup->addAction(action15minutes);
+    connect(action15minutes, &QAction::triggered, this, [this]() {
+        OnShowPreviewMenu(NUM_SECONDS_PREV_15MIN);
+    });
+
+    previewGroup->addAction(action30minutes);
+    connect(action30minutes, &QAction::triggered, this, [this]() {
+        OnShowPreviewMenu(NUM_SECONDS_PREV_30MIN);
+    });
+
+
+    // --- CLOSE ACTION (Qt6 syntax) ---
+    connect(actionClose, &QAction::triggered, this, &QWidget::close);
+
+
+    // --- HEADER CLICK (Qt6 syntax) ---
+    connect(ListViewStations->header(), &QHeaderView::sectionClicked,
+            this, &StationsDlg::OnHeaderClicked);
 
 	//connect(actionGetUpdate, SIGNAL(triggered()), this, SLOT(OnGetUpdate()));
 # ifdef HAVE_LIBHAMLIB

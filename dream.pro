@@ -6,12 +6,6 @@ DEFINES += EXECUTABLE_NAME=$$TARGET
 LIBS += -L$$PWD/lib
 DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x060700
 INCLUDEPATH += $$PWD/include
-contains(QT_VERSION, ^4\\..*) {
-    VERSION_MESSAGE = Qt 4
-}
-contains(QT_VERSION, ^5\\..*) {
-    VERSION_MESSAGE = Qt 5
-}
 contains(QT_VERSION, ^6\\..*) {
     VERSION_MESSAGE = Qt 6
 }
@@ -189,6 +183,9 @@ unix:!cross_compile {
       packagesExist(libgps) {
         CONFIG += gps
       }
+      packagesExist(gpsd) {
+        CONFIG += gps
+      }
       packagesExist(opus) {
         CONFIG += opus
       }
@@ -218,15 +215,13 @@ unix:!cross_compile {
        CONFIG += speexdsp
       }
     }
-    exists(/usr/include/SoapySDR) | \
-    exists(/usr/local/include/SoapySDR) {
-       CONFIG += soapysdr
-    }
+
 }
 
 fdk-aac {
      DEFINES += HAVE_LIBFDK_AAC HAVE_USAC
      LIBS += -lfdk-aac
+     LIBS += -L/usr/lib64/fdk-aac -lfdk-aac
      HEADERS += src/sourcedecoders/fdk_aac_codec.h
      SOURCES += src/sourcedecoders/fdk_aac_codec.cpp
      message("with fdk-aac")
@@ -312,11 +307,7 @@ pulseaudio {
     }
     message("with pulseaudio")
 }
-soapysdr {
-    DEFINES += USE_SOAPYSDR
-    LIBS += -lSoapySDR
-    message("with SoapySDR")
-}
+
 
 HEADERS += \
     src/AMDemodulation.h \
@@ -449,7 +440,6 @@ HEADERS += \
     src/resample/caudioresample.h \
     src/sourcedecoders/reverb.h \
     src/sourcedecoders/caudioreverb.h \
-    src/sound/drm_soapySDR.h \
     src/tuner.h \
     src/sound/soundinterfacefactory.h \
     src/MDI/PacketSocketHTTP.h
@@ -569,7 +559,6 @@ SOURCES += \
     src/resample/caudioresample.cpp \
     src/sourcedecoders/reverb.cpp \
     src/sourcedecoders/caudioreverb.cpp \
-    src/sound/drm_soapySDR.cpp \
     src/tuner.cpp \
     src/sound/soundinterfacefactory.cpp \
     src/MDI/PacketSocketHTTP.cpp
