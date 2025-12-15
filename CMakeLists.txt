@@ -1,569 +1,720 @@
 cmake_minimum_required(VERSION 3.16)
-project(dream VERSION 1.0 LANGUAGES C CXX)
+
+# LANGUAGES "C" is a bugfix for Journaline linking issue: dabdgdec_impl.c
+#dabdgdec_impl.c is VERY weird
+project(dream LANGUAGES C CXX)
+set(PROJECT_NAME dream)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Core5Compat Network Svg Xml)
-find_package(Qt5Network REQUIRED)
-find_library(QWT_LIB NAMES qwt qwt-qt5 qwt-qt6 qwt6 HINTS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu REQUIRED)
-find_path(QWT_INCLUDE_DIR NAMES qwt_dial.h HINTS /usr/include /usr/local/include /usr/include/qwt /usr/local/qwt-6.3.0/include REQUIRED)
-qt_standard_project_setup()
 
-qt_add_executable(dream WIN32 MACOSX_BUNDLE
-    src/AMDemodulation.cpp src/AMDemodulation.h
-    src/AMSSDemodulation.cpp src/AMSSDemodulation.h
-    src/DataIO.cpp src/DataIO.h
-    src/DrmReceiver.cpp src/DrmReceiver.h
-    src/DrmSimulation.cpp src/DrmSimulation.h
-    src/DrmTransceiver.cpp src/DrmTransceiver.h
-    src/DrmTransmitter.cpp src/DrmTransmitter.h
-    src/FAC/FAC.cpp src/FAC/FAC.h
-    src/GlobalDefinitions.h
-    src/IQInputFilter.cpp src/IQInputFilter.h
-    src/InputResample.cpp src/InputResample.h
-    src/MDI/AFPacketGenerator.cpp src/MDI/AFPacketGenerator.h
-    src/MDI/MDIDecode.cpp src/MDI/MDIDecode.h
-    src/MDI/MDIDefinitions.h
-    src/MDI/MDIInBuffer.cpp src/MDI/MDIInBuffer.h
-    src/MDI/MDIRSCI.cpp src/MDI/MDIRSCI.h
-    src/MDI/MDITagItemDecoders.cpp src/MDI/MDITagItemDecoders.h
-    src/MDI/MDITagItems.cpp src/MDI/MDITagItems.h
-    src/MDI/PacketInOut.h
-    src/MDI/PacketSinkFile.cpp src/MDI/PacketSinkFile.h
-    src/MDI/PacketSocket.cpp src/MDI/PacketSocket.h
-    src/MDI/PacketSocketHTTP.cpp src/MDI/PacketSocketHTTP.h
-    src/MDI/PacketSourceFile.cpp src/MDI/PacketSourceFile.h
-    src/MDI/Pft.cpp src/MDI/Pft.h
-    src/MDI/RCITagItems.cpp src/MDI/RCITagItems.h
-    src/MDI/RSCITagItemDecoders.cpp src/MDI/RSCITagItemDecoders.h
-    src/MDI/RSISubscriber.cpp src/MDI/RSISubscriber.h
-    src/MDI/TagItemDecoder.h
-    src/MDI/TagPacketDecoder.cpp src/MDI/TagPacketDecoder.h
-    src/MDI/TagPacketDecoderMDI.cpp src/MDI/TagPacketDecoderMDI.h
-    src/MDI/TagPacketDecoderRSCIControl.cpp src/MDI/TagPacketDecoderRSCIControl.h
-    src/MDI/TagPacketGenerator.cpp src/MDI/TagPacketGenerator.h
-    src/MSC/aacsuperframe.cpp src/MSC/aacsuperframe.h
-    src/MSC/audiosuperframe.cpp src/MSC/audiosuperframe.h
-    src/MSC/frameborderdescription.cpp src/MSC/frameborderdescription.h
-    src/MSC/logicalframe.cpp src/MSC/logicalframe.h
-    src/MSC/xheaacsuperframe.cpp src/MSC/xheaacsuperframe.h
-    src/MSCMultiplexer.cpp src/MSCMultiplexer.h
-    src/OFDM.cpp src/OFDM.h
-    src/Parameter.cpp src/Parameter.h
-    src/PlotManager.cpp src/PlotManager.h
-    src/ReceptLog.cpp src/ReceptLog.h
-    src/SDC/SDC.h
-    src/SDC/SDCReceive.cpp
-    src/SDC/SDCTransmit.cpp
-    src/SDC/audioparam.cpp src/SDC/audioparam.h
-    src/Scheduler.cpp src/Scheduler.h
-    src/ServiceInformation.cpp src/ServiceInformation.h
-    src/SimulationParameters.cpp
-    src/TextMessage.cpp src/TextMessage.h
-    src/UpsampleFilter.h
-    src/Version.cpp src/Version.h
-    src/chanest/ChanEstTime.cpp src/chanest/ChanEstTime.h
-    src/chanest/ChannelEstimation.cpp src/chanest/ChannelEstimation.h
-    src/chanest/IdealChannelEstimation.cpp src/chanest/IdealChannelEstimation.h
-    src/chanest/TimeLinear.cpp src/chanest/TimeLinear.h
-    src/chanest/TimeWiener.cpp src/chanest/TimeWiener.h
-    src/creceivedata.cpp src/creceivedata.h
-    src/ctransmitdata.cpp src/ctransmitdata.h
-    src/datadecoding/DABMOT.cpp src/datadecoding/DABMOT.h
-    src/datadecoding/DataDecoder.cpp src/datadecoding/DataDecoder.h
-    src/datadecoding/DataEncoder.cpp src/datadecoding/DataEncoder.h
-    src/datadecoding/Experiment.cpp src/datadecoding/Experiment.h
-    src/datadecoding/Journaline.cpp src/datadecoding/Journaline.h
-    src/datadecoding/MOTSlideShow.cpp src/datadecoding/MOTSlideShow.h
-    src/datadecoding/epgutil.cpp src/datadecoding/epgutil.h
-    src/datadecoding/journaline/NML.cpp src/datadecoding/journaline/NML.h
-    src/datadecoding/journaline/Splitter.cpp src/datadecoding/journaline/Splitter.h
-    src/datadecoding/journaline/cpplog.h
-    src/datadecoding/journaline/crc_8_16.c src/datadecoding/journaline/crc_8_16.h
-    src/datadecoding/journaline/dabdatagroupdecoder.h
-    src/datadecoding/journaline/dabdgdec_impl.c src/datadecoding/journaline/dabdgdec_impl.h
-    src/datadecoding/journaline/log.c src/datadecoding/journaline/log.h
-    src/datadecoding/journaline/newsobject.cpp src/datadecoding/journaline/newsobject.h
-    src/datadecoding/journaline/newssvcdec.h
-    src/datadecoding/journaline/newssvcdec_impl.cpp src/datadecoding/journaline/newssvcdec_impl.h
-    src/drmchannel/ChannelSimulation.cpp src/drmchannel/ChannelSimulation.h
-    src/interleaver/BlockInterleaver.cpp src/interleaver/BlockInterleaver.h
-    src/interleaver/SymbolInterleaver.cpp src/interleaver/SymbolInterleaver.h
-    src/matlib/Matlib.h
-    src/matlib/MatlibSigProToolbox.cpp src/matlib/MatlibSigProToolbox.h
-    src/matlib/MatlibStdToolbox.cpp src/matlib/MatlibStdToolbox.h
-    src/mlc/BitInterleaver.cpp src/mlc/BitInterleaver.h
-    src/mlc/ChannelCode.cpp src/mlc/ChannelCode.h
-    src/mlc/ConvEncoder.cpp src/mlc/ConvEncoder.h
-    src/mlc/EnergyDispersal.cpp src/mlc/EnergyDispersal.h
-    src/mlc/MLC.cpp src/mlc/MLC.h
-    src/mlc/Metric.cpp src/mlc/Metric.h
-    src/mlc/QAMMapping.cpp src/mlc/QAMMapping.h
-    src/mlc/TrellisUpdateMMX.cpp
-    src/mlc/TrellisUpdateSSE2.cpp
-    src/mlc/ViterbiDecoder.cpp src/mlc/ViterbiDecoder.h
-    src/ofdmcellmapping/CellMappingTable.cpp src/ofdmcellmapping/CellMappingTable.h
-    src/ofdmcellmapping/OFDMCellMapping.cpp src/ofdmcellmapping/OFDMCellMapping.h
-    src/resample/Resample.cpp src/resample/Resample.h
-    src/resample/ResampleFilter.cpp src/resample/ResampleFilter.h
-    src/resample/caudioresample.cpp src/resample/caudioresample.h
-    src/resample/cspectrumresample.cpp src/resample/cspectrumresample.h
-    src/resample/speexresampler.cpp src/resample/speexresampler.h
-    src/sound/audiofilein.cpp src/sound/audiofilein.h
-    src/sound/drm_soapySDR.cpp src/sound/drm_soapySDR.h
-    src/sound/selectioninterface.cpp src/sound/selectioninterface.h
-    src/sound/soundinterface.cpp src/sound/soundinterface.h
-    src/sound/soundinterfacefactory.cpp src/sound/soundinterfacefactory.h
-    src/sound/soundnull.cpp src/sound/soundnull.h
-    src/sourcedecoders/AudioCodec.cpp src/sourcedecoders/AudioCodec.h
-    src/sourcedecoders/AudioSourceDecoder.cpp src/sourcedecoders/AudioSourceDecoder.h
-    src/sourcedecoders/AudioSourceEncoder.cpp src/sourcedecoders/AudioSourceEncoder.h
-    src/sourcedecoders/aac_codec.cpp src/sourcedecoders/aac_codec.h
-    src/sourcedecoders/caudioreverb.cpp src/sourcedecoders/caudioreverb.h
-    src/sourcedecoders/null_codec.cpp src/sourcedecoders/null_codec.h
-    src/sourcedecoders/opus_codec.cpp src/sourcedecoders/opus_codec.h
-    src/sourcedecoders/reverb.cpp src/sourcedecoders/reverb.h
-    src/spectrumanalyser.cpp src/spectrumanalyser.h
-    src/sync/FreqSyncAcq.cpp src/sync/FreqSyncAcq.h
-    src/sync/SyncUsingPil.cpp src/sync/SyncUsingPil.h
-    src/sync/TimeSync.cpp src/sync/TimeSync.h
-    src/sync/TimeSyncFilter.cpp src/sync/TimeSyncFilter.h
-    src/sync/TimeSyncTrack.cpp src/sync/TimeSyncTrack.h
-    src/tables/TableAMSS.h
-    src/tables/TableCarMap.cpp src/tables/TableCarMap.h
-    src/tables/TableDRMGlobal.h
-    src/tables/TableFAC.cpp src/tables/TableFAC.h
-    src/tables/TableMLC.h
-    src/tables/TableQAMMapping.h
-    src/tables/TableStations.cpp src/tables/TableStations.h
-    src/tuner.cpp src/tuner.h
-    src/util/AudioFile.h
-    src/util/Buffer.h
-    src/util/CRC.cpp src/util/CRC.h
-    src/util/FileTyper.cpp src/util/FileTyper.h
-    src/util/LibraryLoader.h
-    src/util/LogPrint.cpp src/util/LogPrint.h
-    src/util/Modul.h
-    src/util/Pacer.h
-    src/util/Reassemble.cpp src/util/Reassemble.h
-    src/util/Settings.cpp src/util/Settings.h
-    src/util/Utilities.cpp src/util/Utilities.h
-    src/util/Vector.h
+option(USE_QT "Enable Qt support" ON)
+set(QT_MAJOR_VERSION 6 CACHE STRING "Prefer Qt major version (5 or 6). Used to select find_package behaviour")
+option(CONSOLE "Build console (non-GUI) target" OFF)
+option(QTCONSOLE "Build Qt console (CLI with some Qt) target" OFF)
+option(CROSS_COMPILE "Cross-compile build (affects some platform checks and messages)" OFF)
+
+# Defaults
+option(ENABLE_FDK_AAC "Enable fdk-aac" OFF)
+option(ENABLE_OPUS "Enable opus" OFF)
+option(ENABLE_SNDFILE "Enable libsndfile" OFF)
+option(ENABLE_SPEEXDSP "Enable speexdsp" OFF)
+option(ENABLE_GPS "Enable libgps" OFF)
+option(ENABLE_HAMLIB "Enable hamlib" OFF)
+option(ENABLE_QWT "Enable Qwt support" OFF)
+option(ENABLE_ALSA "Enable ALSA support" OFF)
+option(ENABLE_PORTAUDIO "Enable PortAudio support" OFF)
+option(ENABLE_PULSEAUDIO "Enable PulseAudio support" OFF)
+
+if(NOT USE_QT)
+    set(CONSOLE ON)
+endif()
+
+
+list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")
+list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/GUI-QT" "${CMAKE_SOURCE_DIR}/src/util-QT" "${CMAKE_SOURCE_DIR}/src/main-Qt")
+
+
+add_compile_definitions(EXECUTABLE_NAME="${PROJECT_NAME}")
+add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060700)
+add_compile_definitions(WARN_ON)
+
+set(HEADER_FILES
+    ${CMAKE_SOURCE_DIR}/src/AMDemodulation.h
+    ${CMAKE_SOURCE_DIR}/src/AMSSDemodulation.h
+    ${CMAKE_SOURCE_DIR}/src/chanest/ChanEstTime.h
+    ${CMAKE_SOURCE_DIR}/src/chanest/ChannelEstimation.h
+    ${CMAKE_SOURCE_DIR}/src/chanest/IdealChannelEstimation.h
+    ${CMAKE_SOURCE_DIR}/src/chanest/TimeLinear.h
+    ${CMAKE_SOURCE_DIR}/src/chanest/TimeWiener.h
+    ${CMAKE_SOURCE_DIR}/src/creceivedata.h
+    ${CMAKE_SOURCE_DIR}/src/ctransmitdata.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/DABMOT.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataDecoder.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataEncoder.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/epgutil.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/Experiment.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/cpplog.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/crc_8_16.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdatagroupdecoder.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdgdec_impl.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/Journaline.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/log.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newsobject.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newssvcdec.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newssvcdec_impl.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/NML.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/Splitter.h
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/MOTSlideShow.h
+    ${CMAKE_SOURCE_DIR}/src/DataIO.h
+    ${CMAKE_SOURCE_DIR}/src/drmchannel/ChannelSimulation.h
+    ${CMAKE_SOURCE_DIR}/src/DrmReceiver.h
+    ${CMAKE_SOURCE_DIR}/src/DrmSimulation.h
+    ${CMAKE_SOURCE_DIR}/src/DrmTransceiver.h
+    ${CMAKE_SOURCE_DIR}/src/DrmTransmitter.h
+    ${CMAKE_SOURCE_DIR}/src/FAC/FAC.h
+    ${CMAKE_SOURCE_DIR}/src/GlobalDefinitions.h
+    ${CMAKE_SOURCE_DIR}/src/InputResample.h
+    ${CMAKE_SOURCE_DIR}/src/interleaver/BlockInterleaver.h
+    ${CMAKE_SOURCE_DIR}/src/interleaver/SymbolInterleaver.h
+    ${CMAKE_SOURCE_DIR}/src/IQInputFilter.h
+    ${CMAKE_SOURCE_DIR}/src/matlib/Matlib.h
+    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibSigProToolbox.h
+    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibStdToolbox.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/AFPacketGenerator.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIDecode.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIDefinitions.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIInBuffer.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIRSCI.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItemDecoders.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItems.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketInOut.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSinkFile.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocket.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSourceFile.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/Pft.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/RCITagItems.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/RSCITagItemDecoders.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/RSISubscriber.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagItemDecoder.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoder.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderMDI.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderRSCIControl.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketGenerator.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/BitInterleaver.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/ChannelCode.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/ConvEncoder.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/EnergyDispersal.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/Metric.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/MLC.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/QAMMapping.h
+    ${CMAKE_SOURCE_DIR}/src/mlc/ViterbiDecoder.h
+    ${CMAKE_SOURCE_DIR}/src/MSCMultiplexer.h
+    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/CellMappingTable.h
+    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/OFDMCellMapping.h
+    ${CMAKE_SOURCE_DIR}/src/OFDM.h
+    ${CMAKE_SOURCE_DIR}/src/Parameter.h
+    ${CMAKE_SOURCE_DIR}/src/PlotManager.h
+    ${CMAKE_SOURCE_DIR}/src/ReceptLog.h
+    ${CMAKE_SOURCE_DIR}/src/resample/ResampleFilter.h
+    ${CMAKE_SOURCE_DIR}/src/resample/Resample.h
+    ${CMAKE_SOURCE_DIR}/src/Scheduler.h
+    ${CMAKE_SOURCE_DIR}/src/SDC/SDC.h
+    ${CMAKE_SOURCE_DIR}/src/SDC/audioparam.h
+    ${CMAKE_SOURCE_DIR}/src/ServiceInformation.h
+    ${CMAKE_SOURCE_DIR}/src/sound/audiofilein.h
+    ${CMAKE_SOURCE_DIR}/src/sound/selectioninterface.h
+    ${CMAKE_SOURCE_DIR}/src/sound/soundinterface.h
+    ${CMAKE_SOURCE_DIR}/src/sound/soundnull.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/aac_codec.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioCodec.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceDecoder.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceEncoder.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/null_codec.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/opus_codec.h
+    ${CMAKE_SOURCE_DIR}/src/spectrumanalyser.h
+    ${CMAKE_SOURCE_DIR}/src/sync/FreqSyncAcq.h
+    ${CMAKE_SOURCE_DIR}/src/sync/SyncUsingPil.h
+    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncFilter.h
+    ${CMAKE_SOURCE_DIR}/src/sync/TimeSync.h
+    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncTrack.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableAMSS.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableCarMap.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableDRMGlobal.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableFAC.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableMLC.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableQAMMapping.h
+    ${CMAKE_SOURCE_DIR}/src/tables/TableStations.h
+    ${CMAKE_SOURCE_DIR}/src/TextMessage.h
+    ${CMAKE_SOURCE_DIR}/src/UpsampleFilter.h
+    ${CMAKE_SOURCE_DIR}/src/util/AudioFile.h
+    ${CMAKE_SOURCE_DIR}/src/util/Buffer.h
+    ${CMAKE_SOURCE_DIR}/src/util/CRC.h
+    ${CMAKE_SOURCE_DIR}/src/util/FileTyper.h
+    ${CMAKE_SOURCE_DIR}/src/util/LibraryLoader.h
+    ${CMAKE_SOURCE_DIR}/src/util/LogPrint.h
+    ${CMAKE_SOURCE_DIR}/src/util/Modul.h
+    ${CMAKE_SOURCE_DIR}/src/util/Pacer.h
+    ${CMAKE_SOURCE_DIR}/src/util/Reassemble.h
+    ${CMAKE_SOURCE_DIR}/src/util/Settings.h
+    ${CMAKE_SOURCE_DIR}/src/util/Utilities.h
+    ${CMAKE_SOURCE_DIR}/src/util/Vector.h
+    ${CMAKE_SOURCE_DIR}/src/Version.h
+    ${CMAKE_SOURCE_DIR}/src/MSC/logicalframe.h
+    ${CMAKE_SOURCE_DIR}/src/MSC/audiosuperframe.h
+    ${CMAKE_SOURCE_DIR}/src/MSC/aacsuperframe.h
+    ${CMAKE_SOURCE_DIR}/src/MSC/xheaacsuperframe.h
+    ${CMAKE_SOURCE_DIR}/src/MSC/frameborderdescription.h
+    ${CMAKE_SOURCE_DIR}/src/resample/speexresampler.h
+    ${CMAKE_SOURCE_DIR}/src/resample/cspectrumresample.h
+    ${CMAKE_SOURCE_DIR}/src/resample/caudioresample.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/reverb.h
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/caudioreverb.h
+    ${CMAKE_SOURCE_DIR}/src/tuner.h
+    ${CMAKE_SOURCE_DIR}/src/sound/soundinterfacefactory.h
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocketHTTP.h
 )
-target_include_directories(dream PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    src/resample
-    ${QWT_INCLUDE_DIR}
+# Bugfix
+#list(APPEND SOURCE_FILES
+#    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdgdec_impl.c
+#)
+
+set(SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/src/AMDemodulation.cpp
+    ${CMAKE_SOURCE_DIR}/src/AMSSDemodulation.cpp
+    ${CMAKE_SOURCE_DIR}/src/chanest/ChanEstTime.cpp
+    ${CMAKE_SOURCE_DIR}/src/chanest/ChannelEstimation.cpp
+    ${CMAKE_SOURCE_DIR}/src/chanest/IdealChannelEstimation.cpp
+    ${CMAKE_SOURCE_DIR}/src/chanest/TimeLinear.cpp
+    ${CMAKE_SOURCE_DIR}/src/chanest/TimeWiener.cpp
+    ${CMAKE_SOURCE_DIR}/src/creceivedata.cpp
+    ${CMAKE_SOURCE_DIR}/src/ctransmitdata.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/DABMOT.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataDecoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataEncoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/epgutil.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/Experiment.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/Journaline.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/crc_8_16.c
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdgdec_impl.c
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/log.c
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newsobject.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newssvcdec_impl.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/NML.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/Splitter.cpp
+    ${CMAKE_SOURCE_DIR}/src/datadecoding/MOTSlideShow.cpp
+    ${CMAKE_SOURCE_DIR}/src/DataIO.cpp
+    ${CMAKE_SOURCE_DIR}/src/drmchannel/ChannelSimulation.cpp
+    ${CMAKE_SOURCE_DIR}/src/DrmReceiver.cpp
+    ${CMAKE_SOURCE_DIR}/src/DrmSimulation.cpp
+    ${CMAKE_SOURCE_DIR}/src/DrmTransmitter.cpp
+    ${CMAKE_SOURCE_DIR}/src/FAC/FAC.cpp
+    ${CMAKE_SOURCE_DIR}/src/InputResample.cpp
+    ${CMAKE_SOURCE_DIR}/src/interleaver/BlockInterleaver.cpp
+    ${CMAKE_SOURCE_DIR}/src/interleaver/SymbolInterleaver.cpp
+    ${CMAKE_SOURCE_DIR}/src/IQInputFilter.cpp
+    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibSigProToolbox.cpp
+    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibStdToolbox.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/AFPacketGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIDecode.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIInBuffer.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDIRSCI.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItemDecoders.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItems.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSinkFile.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocket.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSourceFile.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/Pft.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/RCITagItems.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/RSCITagItemDecoders.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/RSISubscriber.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderMDI.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderRSCIControl.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/BitInterleaver.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/ChannelCode.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/ConvEncoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/EnergyDispersal.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/Metric.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/MLC.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/QAMMapping.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/TrellisUpdateMMX.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/TrellisUpdateSSE2.cpp
+    ${CMAKE_SOURCE_DIR}/src/mlc/ViterbiDecoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/MSCMultiplexer.cpp
+    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/CellMappingTable.cpp
+    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/OFDMCellMapping.cpp
+    ${CMAKE_SOURCE_DIR}/src/OFDM.cpp
+    ${CMAKE_SOURCE_DIR}/src/Parameter.cpp
+    ${CMAKE_SOURCE_DIR}/src/PlotManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/ReceptLog.cpp
+    ${CMAKE_SOURCE_DIR}/src/resample/Resample.cpp
+    ${CMAKE_SOURCE_DIR}/src/resample/ResampleFilter.cpp
+    ${CMAKE_SOURCE_DIR}/src/Scheduler.cpp
+    ${CMAKE_SOURCE_DIR}/src/SDC/SDCReceive.cpp
+    ${CMAKE_SOURCE_DIR}/src/SDC/SDCTransmit.cpp
+    ${CMAKE_SOURCE_DIR}/src/SDC/audioparam.cpp
+    ${CMAKE_SOURCE_DIR}/src/ServiceInformation.cpp
+    ${CMAKE_SOURCE_DIR}/src/SimulationParameters.cpp
+    ${CMAKE_SOURCE_DIR}/src/sound/audiofilein.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/aac_codec.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioCodec.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceDecoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceEncoder.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/null_codec.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/opus_codec.cpp
+    ${CMAKE_SOURCE_DIR}/src/spectrumanalyser.cpp
+    ${CMAKE_SOURCE_DIR}/src/sync/FreqSyncAcq.cpp
+    ${CMAKE_SOURCE_DIR}/src/sync/SyncUsingPil.cpp
+    ${CMAKE_SOURCE_DIR}/src/sync/TimeSync.cpp
+    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncFilter.cpp
+    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncTrack.cpp
+    ${CMAKE_SOURCE_DIR}/src/tables/TableCarMap.cpp
+    ${CMAKE_SOURCE_DIR}/src/tables/TableFAC.cpp
+    ${CMAKE_SOURCE_DIR}/src/tables/TableStations.cpp
+    ${CMAKE_SOURCE_DIR}/src/TextMessage.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/CRC.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/FileTyper.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/LogPrint.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/Reassemble.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/Settings.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/Utilities.cpp
+    ${CMAKE_SOURCE_DIR}/src/Version.cpp
+    ${CMAKE_SOURCE_DIR}/src/sound/soundnull.cpp
+    ${CMAKE_SOURCE_DIR}/src/DrmTransceiver.cpp
+    ${CMAKE_SOURCE_DIR}/src/sound/soundinterface.cpp
+    ${CMAKE_SOURCE_DIR}/src/sound/selectioninterface.cpp
+    ${CMAKE_SOURCE_DIR}/src/MSC/logicalframe.cpp
+    ${CMAKE_SOURCE_DIR}/src/MSC/audiosuperframe.cpp
+    ${CMAKE_SOURCE_DIR}/src/MSC/aacsuperframe.cpp
+    ${CMAKE_SOURCE_DIR}/src/MSC/xheaacsuperframe.cpp
+    ${CMAKE_SOURCE_DIR}/src/MSC/frameborderdescription.cpp
+    ${CMAKE_SOURCE_DIR}/src/resample/speexresampler.cpp
+    ${CMAKE_SOURCE_DIR}/src/resample/cspectrumresample.cpp
+    ${CMAKE_SOURCE_DIR}/src/resample/caudioresample.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/reverb.cpp
+    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/caudioreverb.cpp
+    ${CMAKE_SOURCE_DIR}/src/tuner.cpp
+    ${CMAKE_SOURCE_DIR}/src/sound/soundinterfacefactory.cpp
+    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocketHTTP.cpp
 )
 
-target_compile_definitions(dream PRIVATE
-    EXECUTABLE_NAME=dream
-    QT_DISABLE_DEPRECATED_UP_TO=0x060000
-)
 
-target_link_directories(dream PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib
-)
+if(UNIX)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/Pacer.cpp)
+    add_compile_definitions(HAVE_DLFCN_H HAVE_MEMORY_H HAVE_STDINT_H HAVE_STDLIB_H
+                            HAVE_STRINGS_H HAVE_STRING_H STDC_HEADERS
+                            HAVE_INTTYPES_H HAVE_SYS_STAT_H HAVE_SYS_TYPES_H HAVE_UNISTD_H
+                            HAVE_LIBZ)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES dl rt)
+    list(APPEND EXTRA_LIBS "-lfftw3" "-lz")
+endif()
 
-target_link_libraries(dream PRIVATE
-    Qt::Core
-    Qt::Gui
-    Qt6::Network
-    speexdsp
-    SoapySDR
-    qwt-qt5
-    libqwt-qt5-6
-    libqwt-qt5-dev
-    ${QWT_LIB}
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "linux")
+    list(APPEND EXTRA_LIBS "-ldl" "-lrt")
+endif()
 
-)
 
-if(console)
-    target_sources(dream PUBLIC
-        src/main.cpp
+if(CONSOLE)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/main.cpp)
+    # unix:!cross_compile extras
+    if(UNIX AND NOT CROSS_COMPILE)
+        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.h)
+        list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.cpp)
+        list(APPEND EXTRA_LIBS "-lpthread")
+        message(STATUS "Building with terminal user interface (console)")
+    endif()
+endif()
+
+# Qt console (uses Qt but without GUI)
+if(QTCONSOLE)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/main-Qt/main.cpp)
+    if(UNIX AND NOT CROSS_COMPILE)
+        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.h)
+        list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.cpp)
+        message(STATUS "Building Qt console with terminal user interface")
+    endif()
+endif()
+
+# If Qt GUI support is enabled, add GUI-specific sources & forms
+set(FORMS "")
+set(GUI_HEADERS "")
+set(GUI_SOURCES "")
+set(RESOURCES "")
+if(USE_QT)
+
+    list(APPEND RESOURCES src/GUI-QT/res/icons.qrc)
+    list(APPEND INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/GUI-QT)
+    list(APPEND FORMS
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AboutDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AMMainWindow.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AMSSDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AACCodecParams.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/OpusCodecParams.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DRMMainWindow.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EPGDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/FMMainWindow.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/GeneralSettingsDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/JLViewer.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/LiveScheduleWindow.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultSettingsDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SlideShowViewer.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/StationsDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/systemevalDlgbase.ui
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/TransmDlgbase.ui
     )
+    list(APPEND GUI_HEADERS
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AnalogDemDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/CWindow.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DialogUtil.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DRMPlot.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EPGDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EvaluationDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fdrmdialog.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fmdialog.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/GeneralSettingsDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/jlbrowser.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/JLViewer.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/LiveScheduleDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultColorLED.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultSettingsDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Schedule.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SlideShowViewer.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SoundCardSelMenu.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/StationsDlg.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/OpusCodecParams.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AACCodecParams.h
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/TransmDlg.h
+    )
+    list(APPEND GUI_SOURCES
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AnalogDemDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/CWindow.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DialogUtil.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DRMPlot.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EPGDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EvaluationDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fdrmdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fmdialog.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/GeneralSettingsDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/jlbrowser.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/JLViewer.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/LiveScheduleDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultColorLED.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultSettingsDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Schedule.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SlideShowViewer.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SoundCardSelMenu.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/StationsDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/OpusCodecParams.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AACCodecParams.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/TransmDlg.cpp
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp
+    )
+    list(APPEND SOURCE_FILES ${GUI_SOURCES})
+    list(APPEND HEADER_FILES ${GUI_HEADERS})
+endif()
 
-    target_link_libraries(dream PRIVATE
-        # Remove flag: -core
-        # Remove flag: -gui
+if(USE_QT)
+    list(APPEND HEADER_FILES
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Logging.h
+        ${CMAKE_SOURCE_DIR}/src/util-QT/epgdec.h
+        ${CMAKE_SOURCE_DIR}/src/util-QT/EPG.h
+        ${CMAKE_SOURCE_DIR}/src/util-QT/Util.h
+        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctrx.h
+        ${CMAKE_SOURCE_DIR}/src/main-Qt/crx.h
+        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctx.h
+    )
+    list(APPEND SOURCE_FILES
+        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Logging.cpp
+        ${CMAKE_SOURCE_DIR}/src/util-QT/EPG.cpp
+        ${CMAKE_SOURCE_DIR}/src/util-QT/epgdec.cpp
+        ${CMAKE_SOURCE_DIR}/src/util-QT/Util.cpp
+        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctrx.cpp
+        ${CMAKE_SOURCE_DIR}/src/main-Qt/crx.cpp
+        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctx.cpp
     )
 endif()
 
-if(UNIX AND console AND NOT CMAKE_CROSSCOMPILING)
-    target_sources(dream PUBLIC
-        src/linux/ConsoleIO.cpp src/linux/ConsoleIO.h
-    )
-
-    target_link_libraries(dream PRIVATE
-        pthread
-    )
+#Optional features (fdk-aac, opus, sndfile, speexdsp, gps, hamlib)
+if(ENABLE_FDK_AAC)
+    add_compile_definitions(HAVE_LIBFDK_AAC HAVE_USAC)
+    list(APPEND EXTRA_LIBS "-lfdk-aac" "-L/usr/lib64/fdk-aac -lfdk-aac")
+    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sourcedecoders/fdk_aac_codec.h)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sourcedecoders/fdk_aac_codec.cpp)
+    message(STATUS "with fdk-aac")
 endif()
 
-if(qtconsole)
-    target_sources(dream PUBLIC
-        src/main-Qt/main.cpp
-    )
-
-    target_link_libraries(dream PRIVATE
-        # Remove flag: -gui
-        Qt::Core5Compat
-        Qt::Network
-        Qt::Xml
-    )
+if(ENABLE_OPUS)
+    add_compile_definitions(HAVE_LIBOPUS USE_OPUS_LIBRARY)
+    if(UNIX)
+        list(APPEND EXTRA_LIBS "-lopus")
+    endif()
+    message(STATUS "with opus")
 endif()
 
-if(UNIX AND qtconsole AND NOT CMAKE_CROSSCOMPILING)
-    target_sources(dream PUBLIC
-        src/linux/ConsoleIO.cpp src/linux/ConsoleIO.h
-    )
+if(ENABLE_SNDFILE)
+    add_compile_definitions(HAVE_LIBSNDFILE)
+    if(UNIX)
+        list(APPEND EXTRA_LIBS "-lsndfile1")
+    endif()
+    message(STATUS "with libsndfile")
 endif()
 
-if(QT___contains___gui)
-    target_sources(dream PUBLIC
-        src/GUI-QT/AACCodecParams.cpp src/GUI-QT/AACCodecParams.h src/GUI-QT/AACCodecParams.ui
-        src/GUI-QT/AMMainWindow.ui
-        src/GUI-QT/AMSSDlgbase.ui
-        src/GUI-QT/AboutDlgbase.ui
-        src/GUI-QT/AnalogDemDlg.cpp src/GUI-QT/AnalogDemDlg.h
-        src/GUI-QT/CWindow.cpp src/GUI-QT/CWindow.h
-        src/GUI-QT/DRMMainWindow.ui
-        src/GUI-QT/DRMPlot.cpp src/GUI-QT/DRMPlot.h
-        src/GUI-QT/DialogUtil.cpp src/GUI-QT/DialogUtil.h
-        src/GUI-QT/EPGDlg.cpp src/GUI-QT/EPGDlg.h
-        src/GUI-QT/EPGDlgbase.ui
-        src/GUI-QT/EvaluationDlg.cpp src/GUI-QT/EvaluationDlg.h
-        src/GUI-QT/FMMainWindow.ui
-        src/GUI-QT/GeneralSettingsDlg.cpp src/GUI-QT/GeneralSettingsDlg.h
-        src/GUI-QT/GeneralSettingsDlgbase.ui
-        src/GUI-QT/JLViewer.cpp src/GUI-QT/JLViewer.h src/GUI-QT/JLViewer.ui
-        src/GUI-QT/LiveScheduleDlg.cpp src/GUI-QT/LiveScheduleDlg.h
-        src/GUI-QT/LiveScheduleWindow.ui
-        src/GUI-QT/MultColorLED.cpp src/GUI-QT/MultColorLED.h
-        src/GUI-QT/MultSettingsDlg.cpp src/GUI-QT/MultSettingsDlg.h
-        src/GUI-QT/MultSettingsDlgbase.ui
-        src/GUI-QT/OpusCodecParams.cpp src/GUI-QT/OpusCodecParams.h src/GUI-QT/OpusCodecParams.ui
-        src/GUI-QT/Schedule.cpp src/GUI-QT/Schedule.h
-        src/GUI-QT/SlideShowViewer.cpp src/GUI-QT/SlideShowViewer.h src/GUI-QT/SlideShowViewer.ui
-        src/GUI-QT/SoundCardSelMenu.cpp src/GUI-QT/SoundCardSelMenu.h
-        src/GUI-QT/StationsDlg.cpp src/GUI-QT/StationsDlg.h
-        src/GUI-QT/StationsDlgbase.ui
-        src/GUI-QT/TransmDlg.cpp src/GUI-QT/TransmDlg.h
-        src/GUI-QT/TransmDlgbase.ui
-        src/GUI-QT/fdrmdialog.cpp src/GUI-QT/fdrmdialog.h
-        src/GUI-QT/fmdialog.cpp src/GUI-QT/fmdialog.h
-        src/GUI-QT/jlbrowser.cpp src/GUI-QT/jlbrowser.h
-        src/GUI-QT/main.cpp
-        src/GUI-QT/systemevalDlgbase.ui
-    )
-
-    target_include_directories(dream PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/GUI-QT
-    )
-
-    target_link_libraries(dream PRIVATE
-        Qt::Core5Compat
-        Qt::Network
-        Qt::Widgets
-        Qt::Xml
-    )
-
-
-    # Resources:
-    set(icons_resource_files
-        "src/GUI-QT/res/CSAudSNRHist.png"
-        "src/GUI-QT/res/CSChannel.png"
-        "src/GUI-QT/res/CSConstellation.png"
-        "src/GUI-QT/res/CSFAC.png"
-        "src/GUI-QT/res/CSHistory.png"
-        "src/GUI-QT/res/CSHistoryDelDopp.png"
-        "src/GUI-QT/res/CSHistoryFreqSam.png"
-        "src/GUI-QT/res/CSIR.png"
-        "src/GUI-QT/res/CSMSC.png"
-        "src/GUI-QT/res/CSSDC.png"
-        "src/GUI-QT/res/CSSpectrum.png"
-        "src/GUI-QT/res/CSSpectrumAudio.png"
-        "src/GUI-QT/res/CSSpectrumInpPSD.png"
-        "src/GUI-QT/res/CSSpectrumInpSpectr.png"
-        "src/GUI-QT/res/CSSpectrumSNR.png"
-        "src/GUI-QT/res/CSSpectrumShiftedPSD.png"
-        "src/GUI-QT/res/CSSpectrumWaterf.png"
-        "src/GUI-QT/res/CSTF.png"
-        "src/GUI-QT/res/Home.png"
-        "src/GUI-QT/res/JumpBegin.png"
-        "src/GUI-QT/res/JumpEnd.png"
-        "src/GUI-QT/res/LogoFhGIIS.png"
-        "src/GUI-QT/res/LogoJournaline.png"
-        "src/GUI-QT/res/LogoOpus.png"
-        "src/GUI-QT/res/LogoSmall.png"
-        "src/GUI-QT/res/MainIcon.svg"
-        "src/GUI-QT/res/MainIconTx.svg"
-        "src/GUI-QT/res/Refresh.png"
-        "src/GUI-QT/res/StepBack.png"
-        "src/GUI-QT/res/StepForw.png"
-        "src/GUI-QT/res/Stop.png"
-        "src/GUI-QT/res/aac.png"
-        "src/GUI-QT/res/greenCube.png"
-        "src/GUI-QT/res/orangeCube.png"
-        "src/GUI-QT/res/pinkCube.png"
-        "src/GUI-QT/res/redCube.png"
-        "src/GUI-QT/res/smallGreenCube.png"
-    )
-
-    qt_add_resources(dream "icons"
-        PREFIX
-            "/icons"
-        BASE
-            "src/GUI-QT/res"
-        FILES
-            ${icons_resource_files}
-    )
+if(ENABLE_SPEEXDSP)
+    add_compile_definitions(HAVE_SPEEX)
+    list(APPEND EXTRA_LIBS "-lspeexdsp")
+    message(STATUS "with speexdsp")
 endif()
 
-if(QT___contains___gui AND QT___contains___webenginewidgets)
-    target_sources(dream PUBLIC
-        src/GUI-QT/BWSViewer.cpp src/GUI-QT/BWSViewer.h src/GUI-QT/BWSViewer.ui
+
+if(ENABLE_HAMLIB)
+    add_compile_definitions(HAVE_LIBHAMLIB)
+    if(UNIX)
+        list(APPEND EXTRA_LIBS "-lhamlib")
+    endif()
+    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.h)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.cpp)
+    if(USE_QT)
+        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util-QT/Rig.h)
+        list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util-QT/Rig.cpp)
+    endif()
+    if(USE_QT)
+        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.h)
+        list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.cpp)
+        list(APPEND FORMS ${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.ui)
+    endif()
+    message(STATUS "with hamlib")
+endif()
+
+
+
+if(ENABLE_ALSA)
+    add_compile_definitions(USE_ALSA)
+    list(APPEND HEADER_FILES
+        ${CMAKE_SOURCE_DIR}/src/linux/alsain.h
+        ${CMAKE_SOURCE_DIR}/src/linux/alsaout.h
+        ${CMAKE_SOURCE_DIR}/src/linux/alsacommon.h
     )
+    list(APPEND SOURCE_FILES
+        ${CMAKE_SOURCE_DIR}/src/linux/alsain.cpp
+        ${CMAKE_SOURCE_DIR}/src/linux/alsaout.cpp
+        ${CMAKE_SOURCE_DIR}/src/linux/alsacommon.cpp
+    )
+    list(APPEND EXTRA_LIBS "-lasound")
+    message(STATUS "with alsa")
+endif()
+
+if(ENABLE_PORTAUDIO)
+    add_compile_definitions(USE_PORTAUDIO)
+    list(APPEND HEADER_FILES
+        ${CMAKE_SOURCE_DIR}/src/sound/pa_ringbuffer.h
+        ${CMAKE_SOURCE_DIR}/src/sound/drm_portaudio.h
+    )
+    list(APPEND SOURCE_FILES
+        ${CMAKE_SOURCE_DIR}/src/sound/drm_portaudio.cpp
+        ${CMAKE_SOURCE_DIR}/src/sound/pa_ringbuffer.c
+    )
+    list(APPEND EXTRA_LIBS "-lportaudio")
+    message(STATUS "with portaudio")
+endif()
+
+if(ENABLE_PULSEAUDIO)
+    add_compile_definitions(USE_PULSEAUDIO)
+    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_pulseaudio.h)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_pulseaudio.cpp)
+    if(UNIX)
+        # bugfix
+        # prefer pkg-config libpulse; fallback to -lpulse
+        find_package(PkgConfig QUIET)
+        if(PKG_CONFIG_FOUND)
+            pkg_check_modules(LIBPULSE libpulse QUIET)
+            if(LIBPULSE_FOUND)
+                list(APPEND EXTRA_LIBS ${LIBPULSE_LIBRARIES})
+                list(APPEND INCLUDE_DIRS ${LIBPULSE_INCLUDE_DIRS})
+            else()
+                list(APPEND EXTRA_LIBS "-lpulse")
+            endif()
+        else()
+            list(APPEND EXTRA_LIBS "-lpulse")
+        endif()
+    else()
+        list(APPEND EXTRA_LIBS "-lpulse")
+    endif()
+    message(STATUS "with pulseaudio")
+endif()
+
+
+include_directories(${INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+set(ALL_SOURCES ${SOURCE_FILES})
+set(ALL_HEADERS ${HEADER_FILES})
+
+
+add_executable(${PROJECT_NAME} ${ALL_SOURCES} ${RESOURCES})
+# Make sure the compiler can find generated ui_*.h files
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/dream_autogen/include
+)
+# Bugfix: GPS and Qwt must be after add_executable
+if(ENABLE_GPS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBGPS)
+    if(UNIX)
+        target_link_libraries(${PROJECT_NAME} PRIVATE gps)
+    endif()
+    message(STATUS "with gps")
+endif()
+
+if(ENABLE_QWT)
+    find_path(QWT_INCLUDE_DIR qwt_dial.h
+              PATHS /usr/include /usr/include/qt6 /usr/include/qwt /usr/include/qt6/qwt)
+
+    find_library(QWT_LIB qwt-qt6 qwt)
+
+    if(QWT_INCLUDE_DIR)
+        target_include_directories(${PROJECT_NAME} PRIVATE ${QWT_INCLUDE_DIR})
+    endif()
+
+    if(QWT_LIB)
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${QWT_LIB})
+    endif()
+endif()
+
+foreach(LK IN LISTS EXTRA_LIBS)
+    if(LK MATCHES "^-l" OR LK MATCHES "^-L" OR LK MATCHES "^-Wl,")
+        target_link_options(${PROJECT_NAME} PRIVATE "${LK}")
+    else()
+        target_link_libraries(${PROJECT_NAME} PRIVATE ${LK})
+    endif()
+endforeach()
+if(UNIX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE dl rt)
+endif()
+
+if(UNIX AND NOT CROSS_COMPILE)
+    if(DEFINED ENABLE_LIBPCAP)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBPCAP)
+        find_library(PCAP_LIB pcap)
+        if(PCAP_LIB)
+            target_link_libraries(${PROJECT_NAME} PRIVATE ${PCAP_LIB})
+        else()
+            # fallback to -lpcap
+            target_link_options(${PROJECT_NAME} PRIVATE "-lpcap")
+        endif()
+    endif()
+endif()
+
+# try to find Qt6/Qt5
+if(USE_QT)
+    if(QT_MAJOR_VERSION STREQUAL "6")
+        find_package(Qt6 COMPONENTS Core Widgets Network Xml Svg WebEngineWidgets Core5Compat Gui REQUIRED QUIET)
+        if(Qt6_FOUND)
+            message(STATUS "Qt6 found")
+            # bugfix
+            # Link required components (some configurations might not need all components; link if found)
+            if(TARGET Qt6::Widgets)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
+            endif()
+            if(TARGET Qt6::Network)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Network)
+            endif()
+            if(TARGET Qt6::Xml)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Xml)
+            endif()
+            if(TARGET Qt6::Svg)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
+            endif()
+            if(TARGET Qt6::WebEngineWidgets)
+                # if webenginewidgets available, add BWSViewer UI/sources as in .pro
+                list(APPEND FORMS ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.ui)
+                list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.h)
+                list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.cpp)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::WebEngineWidgets)
+                message(STATUS "with BWS (Qt WebEngineWidgets)")
+            endif()
+            # Qt resource & UI handling
+	qt_standard_project_setup()
+
+	qt_add_resources(${PROJECT_NAME} "resources"
+	    PREFIX "/"
+	    FILES ${RESOURCES}
+	)
+# bugfix for linking issue
+qt6_wrap_ui(QT_FORMS ${FORMS})
+target_sources(${PROJECT_NAME} PRIVATE ${QT_FORMS})
+            # Core5Compat is a Qt6 module mapping to Qt5 behaviour if present
+            if(TARGET Qt6::Core5Compat)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core5Compat)
+            endif()
+        endif()
+    else()
+        # Try Qt5
+        find_package(Qt5 COMPONENTS Core Widgets Network Xml WebEngineWidgets Svg REQUIRED QUIET)
+        if(Qt5_FOUND)
+            message(STATUS "Qt5 found")
+            if(TARGET Qt5::Widgets)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+            endif()
+            if(TARGET Qt5::Network)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Network)
+            endif()
+            if(TARGET Qt5::Xml)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Xml)
+            endif()
+            if(TARGET Qt5::Svg)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Svg)
+            endif()
+            if(TARGET Qt5::WebEngineWidgets)
+                list(APPEND FORMS ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.ui)
+                list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.h)
+                list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.cpp)
+                target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::WebEngineWidgets)
+                message(STATUS "with BWS (Qt WebEngineWidgets)")
+            endif()
+
+            # Process resources and forms for Qt5
+            qt5_add_resources(QT_RESOURCES ${RESOURCES})
+            qt5_wrap_ui(QT_FORMS_MOC ${FORMS})
+            target_sources(${PROJECT_NAME} PRIVATE ${QT_RESOURCES} ${QT_FORMS_MOC})
+        endif()
+    endif()
 endif()
 
 if(UNIX)
-    target_sources(dream PUBLIC
-        src/linux/Pacer.cpp
-    )
-
-    target_compile_definitions(dream PRIVATE
-        HAVE_DLFCN_H
-        HAVE_INTTYPES_H
-        HAVE_LIBZ
-        HAVE_MEMORY_H
-        HAVE_STDINT_H HAVE_STDINT_H
-        HAVE_STDLIB_H
-        HAVE_STRINGS_H
-        HAVE_STRING_H
-        HAVE_SYS_STAT_H
-        HAVE_SYS_TYPES_H
-        HAVE_UNISTD_H
-        STDC_HEADERS
-    )
-
-    target_link_libraries(dream PRIVATE
-        fftw3
-        z
-    )
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION /usr/bin)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/linux/dream.1")
+        install(FILES "${CMAKE_SOURCE_DIR}/linux/dream.1" DESTINATION /usr/share/man/man1)
+    endif()
 endif()
 
-if(UNIX AND NOT CMAKE_CROSSCOMPILING)
-    target_compile_definitions(dream PRIVATE
-        HAVE_LIBPCAP
-    )
-
-    target_link_libraries(dream PRIVATE
-        pcap
-    )
+# qmake type messages
+if(USE_QT)
+    message(STATUS "Qt modules enabled")
+else()
+    message(STATUS "No Qt (console mode)")
 endif()
 
-if(linux-_x_)
-    target_link_libraries(dream PRIVATE
-        dl
-        rt
-    )
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+if(CONSOLE)
+    message(STATUS "UI: console mode")
+elseif(QTCONSOLE)
+    message(STATUS "UI: qtconsole mode")
+else()
+    message(STATUS "UI: GUI mode")
 endif()
 
-if(fdk-aac)
-    target_sources(dream PUBLIC
-        src/sourcedecoders/fdk_aac_codec.cpp src/sourcedecoders/fdk_aac_codec.h
-    )
-
-    target_compile_definitions(dream PRIVATE
-        HAVE_LIBFDK_AAC
-        HAVE_USAC
-    )
-
-    target_link_libraries(dream PRIVATE
-        fdk-aac
-    )
+if(NOT ENABLE_PULSEAUDIO AND NOT ENABLE_PORTAUDIO AND NOT ENABLE_ALSA)
+    message(WARNING "No usable audio interface configured (pulseaudio/portaudio/alsa). Set ENABLE_PULSEAUDIO or ENABLE_PORTAUDIO or ENABLE_ALSA.")
+    # In the original .pro an error() would stop qmake
+    # might be importart if only soapySDR is used (TODO!)
+    #message(FATAL_ERROR "no usable audio interface found - install pulseaudio or portaudio dev package")
 endif()
 
-if(opus)
-    target_compile_definitions(dream PRIVATE
-        HAVE_LIBOPUS
-        USE_OPUS_LIBRARY
-    )
-endif()
-
-if(UNIX AND opus)
-    target_link_libraries(dream PRIVATE
-        opus
-    )
-endif()
-
-if(sndfile)
-    target_compile_definitions(dream PRIVATE
-        HAVE_LIBSNDFILE
-    )
-endif()
-
-if(UNIX AND sndfile)
-    target_link_libraries(dream PRIVATE
-        sndfile1
-    )
-endif()
-
-if(speexdsp)
-    target_compile_definitions(dream PRIVATE
-        HAVE_SPEEX
-    )
-
-    target_link_libraries(dream PRIVATE
-        speexdsp
-    )
-endif()
-
-if(gps)
-    target_compile_definitions(dream PRIVATE
-        HAVE_LIBGPS
-    )
-endif()
-
-if(UNIX AND gps)
-    target_link_libraries(dream PRIVATE
-        gps
-    )
-endif()
-
-if(hamlib)
-    target_sources(dream PUBLIC
-        src/util/Hamlib.cpp src/util/Hamlib.h
-    )
-
-    target_compile_definitions(dream PRIVATE
-        HAVE_LIBHAMLIB
-    )
-endif()
-
-if(UNIX AND hamlib)
-    target_link_libraries(dream PRIVATE
-        hamlib
-    )
-endif()
-
-if(QT___contains___core AND hamlib)
-    target_sources(dream PUBLIC
-        src/util-QT/Rig.cpp src/util-QT/Rig.h
-    )
-endif()
-
-if(QT___contains___gui AND hamlib)
-    target_sources(dream PUBLIC
-        RigDlg.ui
-        src/GUI-QT/RigDlg.cpp src/GUI-QT/RigDlg.h
-    )
-endif()
-
-if(qwt)
-    target_link_libraries(dream PRIVATE
-        Qt::Svg
-    )
-endif()
-
-if((qwt) AND (unix))
-    target_link_libraries(dream PRIVATE
-        qwt-qt5
-    )
-endif()
-
-if(((qwt) AND (NOT crosscompile)) AND (EXISTS /usr/include/qwt/qwt.h))
-    target_include_directories(dream PRIVATE
-        /usr/include/qwt
-    )
-endif()
-
-if(((qwt) AND (NOT crosscompile)) AND (EXISTS /usr/local/include/qwt/qwt.h))
-    target_include_directories(dream PRIVATE
-        /usr/local/include/qwt
-    )
-endif()
-
-if(alsa)
-    target_sources(dream PUBLIC
-        src/linux/alsacommon.cpp src/linux/alsacommon.h
-        src/linux/alsain.cpp src/linux/alsain.h
-        src/linux/alsaout.cpp src/linux/alsaout.h
-    )
-
-    target_compile_definitions(dream PRIVATE
-        USE_ALSA
-    )
-
-    target_link_libraries(dream PRIVATE
-        asound
-    )
-endif()
-
-if(portaudio)
-    target_sources(dream PUBLIC
-        src/sound/drm_portaudio.cpp src/sound/drm_portaudio.h
-        src/sound/pa_ringbuffer.c src/sound/pa_ringbuffer.h
-    )
-
-    target_compile_definitions(dream PRIVATE
-        USE_PORTAUDIO
-    )
-
-    target_link_libraries(dream PRIVATE
-        portaudio
-    )
-endif()
-
-if(pulseaudio)
-    target_sources(dream PUBLIC
-        src/sound/drm_pulseaudio.cpp src/sound/drm_pulseaudio.h
-    )
-
-    target_compile_definitions(dream PRIVATE
-        USE_PULSEAUDIO
-    )
-endif()
-
-if(WIN32 AND pulseaudio)
-    target_link_libraries(dream PRIVATE
-        pulse
-    )
-endif()
-
-if(soapysdr)
-    target_compile_definitions(dream PRIVATE
-        USE_SOAPYSDR
-    )
-
-    target_link_libraries(dream PRIVATE
-        SoapySDR
-    )
-endif()
-
-if(QT___contains___core)
-    target_sources(dream PUBLIC
-        src/GUI-QT/Logging.cpp src/GUI-QT/Logging.h
-        src/main-Qt/crx.cpp src/main-Qt/crx.h
-        src/main-Qt/ctrx.cpp src/main-Qt/ctrx.h
-        src/main-Qt/ctx.cpp src/main-Qt/ctx.h
-        src/util-QT/EPG.cpp src/util-QT/EPG.h
-        src/util-QT/Util.cpp src/util-QT/Util.h
-        src/util-QT/epgdec.cpp src/util-QT/epgdec.h
-    )
-endif()
-
-install(TARGETS dream
-    BUNDLE DESTINATION .
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-qt_generate_deploy_app_script(
-    TARGET dream
-    FILENAME_VARIABLE deploy_script
-    NO_UNSUPPORTED_PLATFORM_ERROR
-)
-install(SCRIPT ${deploy_script})
+set(DREAM_INCLUDE_DIRS ${INCLUDE_DIRS} CACHE INTERNAL "dream include dirs")
+set(DREAM_EXTRA_LIBS ${EXTRA_LIBS} CACHE INTERNAL "dream extra libs")
