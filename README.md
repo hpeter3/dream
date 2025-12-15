@@ -1,9 +1,10 @@
 
 # dream-qt6
 
-An experimental Qt6 port of the Dream AM/DRM Receiver program for GNU/Linux.
-Source code of the original project: https://sourceforge.net/p/drm/code/HEAD/tree/
-Currently this program is only tested on Fedora 42. At the time of writing (December 15th 2025) this software is in the Qt5 to Qt6 transition phase, plus additional compile time fixes (including the "DEBUG2025" fixes)
+An experimental Qt6 port of the Dream AM/DRM Receiver program for GNU/Linux. \
+Source code of the original project: https://sourceforge.net/p/drm/code/HEAD/tree/branches/dream-ollie-deployed/ \
+Currently this program is only tested on Fedora 42. \
+At the time of writing (December 15th 2025) this software is in the Qt5 to Qt6 transition phase, plus additional compile time fixes (including the "DEBUG2025" fixes)
 
 # Prerequisites (Qt6)
 Debian 13:
@@ -11,7 +12,7 @@ Debian 13:
 Qwt on Debian 13 is broken, dream won't compile.
 ```
 Fedora 42:
-Enable RPM Fusion at https://rpmfusion.org/Configuration
+Enable RPM Fusion at https://rpmfusion.org/Configuration \
 Configure multimedia packages at https://rpmfusion.org/Howto/Multimedia
 
 Install the following packages:
@@ -21,7 +22,7 @@ sudo dnf in g++ portaudio-devel qmake fdk-aac-devel libpcap-devel qt6-qt5compat-
 # Compiling
 qmake6 (alsa OR portaudio OR pulseaudio AND CONFIG+=sound):
 ```sh
-qmake6 CONFIG +=alsa CONFIG+=sound
+qmake6 CONFIG+=alsa CONFIG+=sound
 make -j8
 ```
 # Running the program
@@ -35,3 +36,7 @@ Transmitter:
 ```sh
 ./dream -t
 ```
+# Known bugs
+- Dream transmitter starting immediately
+- Dream transmitter doesn't start when compiled with CONFIG+=alsa
+- Compile-time errors related to Qwt on Debian 13
