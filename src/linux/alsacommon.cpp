@@ -42,7 +42,31 @@ string checkName(vector<string> names, string sCurrentDevice)
     if(sDefault == "") return names[0];
     return sDefault;
 }
+bool pipewirePresent() {
+    void **hints;
+    if (snd_device_name_hint(-1, "pcm", &hints) != 0)
+        return false;
 
+    std::vector<std::string> names;
+    void **n = hints;
+    while (*n != nullptr) {
+        char *name = snd_device_name_get_hint(*n, "NAME");
+        if (name) {
+            names.emplace_back(name);   // copy into std::string
+            free(name);                 // free ALSA’s allocation
+        }
+        ++n;
+    }
+
+    snd_device_name_free_hint(hints);
+
+    for (const auto &nm : names) {
+        if (nm == "pipewire") {
+            return true;
+        }
+    }
+    return false;
+}
 snd_pcm_t* Init_hw(snd_pcm_uframes_t period_size, int iSampleRate, string name, snd_pcm_stream_t direction)
 {
 
@@ -52,13 +76,14 @@ snd_pcm_t* Init_hw(snd_pcm_uframes_t period_size, int iSampleRate, string name, 
     snd_pcm_uframes_t buffer_size;
     snd_pcm_t* handle;
 
-    err = snd_pcm_open( &handle, name.c_str(), direction, 0);
-    if ( err != 0)
-    {
-        qDebug("open error: %s", snd_strerror(err));
-        throw CGenErr("alsa CSoundOut::Init_HW playback, can't open "+name);
-    }
+    std::string devName = pipewirePresent() ? "default" : name;
+    std::cerr << "Init_hw: using ALSA device '" << devName << "'\n";
 
+    err = snd_pcm_open(&handle, devName.c_str(), direction, 0);
+    if (err < 0) {
+        std::cerr << "open error: " << snd_strerror(err) << "\n";
+        throw CGenErr("alsa CSoundOut::Init_HW playback, can't open " + devName);
+    }
     snd_pcm_hw_params_alloca(&hwparams);
     snd_pcm_sw_params_alloca(&swparams);
 
