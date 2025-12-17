@@ -33,7 +33,6 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
-#include <QRegExp>
 #include <iostream>
 #include <cstdlib>
 #include <sys/stat.h>
