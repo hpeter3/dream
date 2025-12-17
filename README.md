@@ -17,7 +17,7 @@ Configure multimedia packages at https://rpmfusion.org/Howto/Multimedia
 
 Install the following packages:
 ```sh
-sudo dnf in g++ portaudio-devel qmake fdk-aac-devel libpcap-devel qt6-qt5compat-devel qt6-qtbase-devel qwt-qt6 qwt-qt6-devel faad2-devel faac-devel hamlib-devel gpsd-devel qt6-qtsvg-devel qt6-qtwebengine-devel fftw-devel speex-devel speexdsp-devel pulseaudio-libs-devel qt6-qttools-devel
+sudo dnf in g++ opus-devel portaudio-devel qmake fdk-aac-devel libpcap-devel qt6-qt5compat-devel qt6-qtbase-devel qwt-qt6 qwt-qt6-devel faad2-devel faac-devel hamlib-devel gpsd-devel qt6-qtsvg-devel qt6-qtwebengine-devel fftw-devel speex-devel speexdsp-devel pulseaudio-libs-devel qt6-qttools-devel
 ```
 # Compiling with CMake (newer, expect bugs, this is an example)
 ```sh
