@@ -28,7 +28,6 @@
 
 #include "Util.h"
 #include "../DrmTransceiver.h"
-#include <QRegExp>
 #include <QUrl>
 #include <QDir>
 #include <QFileInfo>
