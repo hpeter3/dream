@@ -277,7 +277,7 @@ void EPGDlg::select()
         QStringList l;
         l << s_start << name << genre << description << s_duration;
         QTreeWidgetItem* CurrItem = new QTreeWidgetItem(Data, l);
-        QDateTime qdt = QDateTime::fromSecsSinceEpoch(static_cast<qint64>(start), Qt::UTC);
+        QDateTime qdt = QDateTime::fromSecsSinceEpoch(static_cast<qint64>(start), QTimeZone::utc());
         QDateTime dt;
         dt.setDate(qdt.date());
         dt.setTime(qdt.time());
