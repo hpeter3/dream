@@ -335,7 +335,7 @@ public:
         return *this;
     }
 
-    bool operator==(const CAltFreqSched& nAFS)
+    bool operator==(const CAltFreqSched& nAFS) const
     {
         if (iDayCode != nAFS.iDayCode)
             return false;
@@ -383,7 +383,7 @@ public:
         return *this;
     }
 
-    bool operator==(const CAltFreqRegion& nAFR)
+    bool operator==(const CAltFreqRegion& nAFR) const
     {
         if (iLatitude != nAFR.iLatitude)
             return false;
@@ -544,7 +544,7 @@ public:
         return *this;
     }
 
-    bool operator==(const COtherService& nAF)
+    bool operator==(const COtherService& nAF) const
     {
         if (CServiceDefinition(*this) != nAF)
             return false;
