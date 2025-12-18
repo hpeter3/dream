@@ -246,6 +246,7 @@ CAboutDlg::CAboutDlg(QWidget* parent):
         "<p>Fine, Mark J.</p>"
         "<p>Flamand, David</p>"
         "<p>Haffenden, Oliver</p>"
+        "<p>Homolya, Peter Adam (University of Szeged, SZOMEL Kft.)</p>"
         "<p>Kurpiers, Alexander</p>"
         "<p>Manninen, Tomi</p>"
         "<p>Moore, Josh</p>"
