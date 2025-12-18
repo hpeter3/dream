@@ -562,6 +562,22 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/dream_autogen/include
 )
+# Hardening
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -fstack-protector-strong
+    -fstack-clash-protection
+    -D_FORTIFY_SOURCE=2
+    -fPIE
+    -pthread
+)
+
+target_link_options(${PROJECT_NAME} PRIVATE
+    -pie
+    -Wl,-z,relro,-z,now
+    -pthread
+)
+
+
 # Bugfix: GPS and Qwt must be after add_executable
 if(ENABLE_GPS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBGPS)
