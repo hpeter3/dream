@@ -28,7 +28,7 @@ option(ENABLE_QWT "Enable Qwt support" OFF)
 option(ENABLE_ALSA "Enable ALSA support" OFF)
 option(ENABLE_PORTAUDIO "Enable PortAudio support" OFF)
 option(ENABLE_PULSEAUDIO "Enable PulseAudio support" OFF)
-
+option(ENABLE_SOAPYSDR "Enable SoapySDR support" OFF)
 if(NOT USE_QT)
     set(CONSOLE ON)
 endif()
@@ -37,7 +37,7 @@ endif()
 list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")
 list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/GUI-QT" "${CMAKE_SOURCE_DIR}/src/util-QT" "${CMAKE_SOURCE_DIR}/src/main-Qt")
 
-
+# not ideal, but works
 add_compile_definitions(EXECUTABLE_NAME="${PROJECT_NAME}")
 add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060700)
 add_compile_definitions(WARN_ON)
@@ -547,6 +547,26 @@ if(ENABLE_PULSEAUDIO)
     message(STATUS "with pulseaudio")
 endif()
 
+if(ENABLE_SOAPYSDR)
+    add_compile_definitions(USE_SOAPYSDR)
+    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_soapySDR.h)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_soapySDR.cpp)
+
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+        pkg_check_modules(SOAPYSDR SoapySDR QUIET)
+        if(SOAPYSDR_FOUND)
+            list(APPEND EXTRA_LIBS ${SOAPYSDR_LIBRARIES})
+            list(APPEND INCLUDE_DIRS ${SOAPYSDR_INCLUDE_DIRS})
+        else()
+            list(APPEND EXTRA_LIBS "-lSoapySDR")
+        endif()
+    else()
+        list(APPEND EXTRA_LIBS "-lSoapySDR")
+    endif()
+
+    message(STATUS "with SoapySDR")
+endif()
 
 include_directories(${INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
@@ -567,13 +587,20 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -fstack-protector-strong
     -fstack-clash-protection
     -D_FORTIFY_SOURCE=2
+    -D_GLIBCXX_ASSERTIONS #libsdtc++, might not work on Clang / MSVC, TODO!
+    -fstrict-flex-arrays=3
     -fPIE
     -pthread
 )
 
 target_link_options(${PROJECT_NAME} PRIVATE
     -pie
-    -Wl,-z,relro,-z,now
+    -Wl,-z,relro
+    -Wl,-z,now
+    -Wl,-z,nodlopen
+    -Wl,-z,noexecstack
+    -Wl,--as-needed # might break stuff
+    -Wl,--no-copy-dt-needed-entries # might break stuff
     -pthread
 )
 
@@ -603,7 +630,11 @@ if(ENABLE_QWT)
 endif()
 
 foreach(LK IN LISTS EXTRA_LIBS)
-    if(LK MATCHES "^-l" OR LK MATCHES "^-L" OR LK MATCHES "^-Wl,")
+
+    #if(LK MATCHES "^-l" OR LK MATCHES "^-L" OR LK MATCHES "^-Wl,")
+    #bugfix
+    #not the best way to handle this, might rewrite this entirely with two or three lists
+    if(LK MATCHES "^-Wl,")
         target_link_options(${PROJECT_NAME} PRIVATE "${LK}")
     else()
         target_link_libraries(${PROJECT_NAME} PRIVATE ${LK})
@@ -694,11 +725,14 @@ else()
     message(STATUS "UI: GUI mode")
 endif()
 
-if(NOT ENABLE_PULSEAUDIO AND NOT ENABLE_PORTAUDIO AND NOT ENABLE_ALSA)
-    message(WARNING "No usable audio interface configured (pulseaudio/portaudio/alsa). Set ENABLE_PULSEAUDIO or ENABLE_PORTAUDIO or ENABLE_ALSA.")
+if(NOT ENABLE_PULSEAUDIO AND NOT ENABLE_PORTAUDIO AND NOT ENABLE_ALSA AND NOT ENABLE_SOAPYSDR)
+    message(WARNING "No usable audio interface configured (pulseaudio/portaudio/alsa/SoapySDR). Set ENABLE_PULSEAUDIO or ENABLE_PORTAUDIO or ENABLE_ALSA or ENABLE_SOAPYSDR.")
     # In the original .pro an error() would stop qmake
     # might be importart if only soapySDR is used (TODO!)
     #message(FATAL_ERROR "no usable audio interface found - install pulseaudio or portaudio dev package")
+endif()
+if(ENABLE_SOAPYSDR)
+     message(WARNING "ENABLE_SOAPYSDR detected, expect runtime bugs.")
 endif()
 
 set(DREAM_INCLUDE_DIRS ${INCLUDE_DIRS} CACHE INTERNAL "dream include dirs")
