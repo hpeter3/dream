@@ -3,6 +3,7 @@
 
 #include "ctrx.h"
 #include <QObject>
+#include <QString>
 
 class CDRMTransmitter;
 
@@ -36,12 +37,16 @@ public slots:
     virtual void SaveSettings() override;
     virtual void SetInputDevice(std::string) override;
     virtual void SetOutputDevice(std::string) override;
+    void SetInputDevice(const QString &device); //new Qt slot
+    void SetOutputDevice(const QString &device); //new Qt slot
     virtual void Restart();
     virtual void Stop();
     virtual void SetSettings(CSettings* pNewSettings) override;
     virtual void SetTextMessage(std::string);
+    void SetTextMessage(const QString &msg);
     virtual void ClearTextMessage();
     virtual void SetPicFileName(std::string, std::string);
+    void SetPicFileName(const QString &name, const QString &desc);
     virtual void SetPathRemoval(bool);
     virtual void ClearPicFileNames();
     virtual void SetHighQualityIQ(bool);
@@ -49,6 +54,11 @@ public slots:
     virtual void SetCarrierOffset(_REAL);
     virtual void SetIQOutput(int);
     virtual void SetFrequency(int) override;
+    
+signals:
+	void OutputDeviceChanged(const QString &device);
+	void InputDeviceChanged(const QString &device);
+
 private:
     CDRMTransmitter& tx;
     ERunState eRunState;

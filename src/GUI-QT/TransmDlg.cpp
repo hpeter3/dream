@@ -389,67 +389,85 @@ TransmDialog::TransmDialog(CTx& ntx, QWidget* parent)
 
     menu_Settings->addMenu(new CSoundCardSelMenu(tx, pFileMenu, this));
 
-	connect(actionAbout_Dream, SIGNAL(triggered()), &AboutDlg, SLOT(show()));
-    connect(actionWhats_This, SIGNAL(triggered()), reinterpret_cast<QObject*>(this), SLOT(OnWhatsThis()));
+	connect(actionAbout_Dream, &QAction::triggered, &AboutDlg, &QDialog::show);
+	connect(actionWhats_This, &QAction::triggered, this, &TransmDialog::OnWhatsThis);
 
 	/* Connections ---------------------------------------------------------- */
 	/* Push buttons */
-	connect(ButtonStartStop, SIGNAL(clicked()),
-        reinterpret_cast<QObject*>(this), SLOT(OnButtonStartStop()));
-	connect(ButtonCodec, SIGNAL(clicked()),
-        reinterpret_cast<QObject*>(this), SLOT(OnButtonCodec()));
-	connect(PushButtonAddText, SIGNAL(clicked()),
-        reinterpret_cast<QObject*>(this), SLOT(OnPushButtonAddText()));
-	connect(PushButtonClearAllText, SIGNAL(clicked()),
-        reinterpret_cast<QObject*>(this), SLOT(OnButtonClearAllText()));
-	connect(PushButtonAddFile, SIGNAL(clicked()),
-        reinterpret_cast<QObject*>(this), SLOT(OnPushButtonAddFileName()));
-	connect(PushButtonClearAllFileNames, SIGNAL(clicked()),
-        reinterpret_cast<QObject*>(this), SLOT(OnButtonClearAllFileNames()));
+	connect(ButtonStartStop, &QPushButton::clicked,
+			this, &TransmDialog::OnButtonStartStop);
 
+	connect(ButtonCodec, &QPushButton::clicked,
+			this, &TransmDialog::OnButtonCodec);
+
+	connect(PushButtonAddText, &QPushButton::clicked,
+			this, &TransmDialog::OnPushButtonAddText);
+
+	connect(PushButtonClearAllText, &QPushButton::clicked,
+			this, &TransmDialog::OnButtonClearAllText);
+
+	connect(PushButtonAddFile, &QPushButton::clicked,
+			this, &TransmDialog::OnPushButtonAddFileName);
+
+	connect(PushButtonClearAllFileNames, &QPushButton::clicked,
+			this, &TransmDialog::OnButtonClearAllFileNames);
+			
 	/* Check boxes */
-	connect(CheckBoxHighQualityIQ, SIGNAL(toggled(bool)),
-        reinterpret_cast<QObject*>(this), SLOT(OnToggleCheckBoxHighQualityIQ(bool)));
-	connect(CheckBoxAmplifiedOutput, SIGNAL(toggled(bool)),
-        reinterpret_cast<QObject*>(this), SLOT(OnToggleCheckBoxAmplifiedOutput(bool)));
-	connect(CheckBoxEnableTextMessage, SIGNAL(toggled(bool)),
-        reinterpret_cast<QObject*>(this), SLOT(OnToggleCheckBoxEnableTextMessage(bool)));
-	connect(CheckBoxEnableAudio, SIGNAL(toggled(bool)),
-        reinterpret_cast<QObject*>(this), SLOT(OnToggleCheckBoxEnableAudio(bool)));
-	connect(CheckBoxEnableData, SIGNAL(toggled(bool)),
-        reinterpret_cast<QObject*>(this), SLOT(OnToggleCheckBoxEnableData(bool)));
-	connect(CheckBoxRemovePath, SIGNAL(toggled(bool)),
-        reinterpret_cast<QObject*>(this), SLOT(OnToggleCheckBoxRemovePath(bool)));
+	connect(CheckBoxHighQualityIQ, &QCheckBox::toggled,
+			this, &TransmDialog::OnToggleCheckBoxHighQualityIQ);
+
+	connect(CheckBoxAmplifiedOutput, &QCheckBox::toggled,
+			this, &TransmDialog::OnToggleCheckBoxAmplifiedOutput);
+
+	connect(CheckBoxEnableTextMessage, &QCheckBox::toggled,
+			this, &TransmDialog::OnToggleCheckBoxEnableTextMessage);
+
+	connect(CheckBoxEnableAudio, &QCheckBox::toggled,
+			this, &TransmDialog::OnToggleCheckBoxEnableAudio);
+
+	connect(CheckBoxEnableData, &QCheckBox::toggled,
+			this, &TransmDialog::OnToggleCheckBoxEnableData);
+
+	connect(CheckBoxRemovePath, &QCheckBox::toggled,
+			this, &TransmDialog::OnToggleCheckBoxRemovePath);
+
 
 	/* Combo boxes */
-	connect(ComboBoxMSCInterleaver, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxMSCInterleaverActivated(int)));
-	connect(ComboBoxMSCConstellation, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxMSCConstellationActivated(int)));
-	connect(ComboBoxSDCConstellation, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxSDCConstellationActivated(int)));
-	connect(ComboBoxLanguage, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxLanguageActivated(int)));
-	connect(ComboBoxProgramType, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxProgramTypeActivated(int)));
-	connect(ComboBoxTextMessage, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxTextMessageActivated(int)));
-	connect(ComboBoxMSCProtLev, SIGNAL(activated(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnComboBoxMSCProtLevActivated(int)));
+	connect(ComboBoxMSCInterleaver, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxMSCInterleaverActivated);
+
+	connect(ComboBoxMSCConstellation, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxMSCConstellationActivated);
+
+	connect(ComboBoxSDCConstellation, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxSDCConstellationActivated);
+
+	connect(ComboBoxLanguage, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxLanguageActivated);
+
+	connect(ComboBoxProgramType, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxProgramTypeActivated);
+
+	connect(ComboBoxTextMessage, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxTextMessageActivated);
+
+	connect(ComboBoxMSCProtLev, &QComboBox::activated,
+			this, &TransmDialog::OnComboBoxMSCProtLevActivated);
+
 
 	/* Button groups */
-	connect(ButtonGroupRobustnessMode, SIGNAL(buttonClicked(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnRadioRobustnessMode(int)));
-	connect(ButtonGroupBandwidth, SIGNAL(buttonClicked(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnRadioBandwidth(int)));
-	connect(ButtonGroupOutput, SIGNAL(buttonClicked(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnRadioOutput(int)));
-	connect(ButtonGroupCodec, SIGNAL(buttonClicked(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnRadioCodec(int)));
-	connect(ButtonGroupCurrentTime, SIGNAL(buttonClicked(int)),
-        reinterpret_cast<QObject*>(this), SLOT(OnRadioCurrentTime(int)));
-
-	/* Line edits */
+	connect(ButtonGroupRobustnessMode, &QButtonGroup::idClicked,
+			this, &TransmDialog::OnRadioRobustnessMode);
+	connect(ButtonGroupBandwidth, &QButtonGroup::idClicked,
+			this, &TransmDialog::OnRadioBandwidth);
+	connect(ButtonGroupOutput, &QButtonGroup::idClicked,
+			this, &TransmDialog::OnRadioOutput);
+	connect(ButtonGroupCodec, &QButtonGroup::idClicked,
+			this, &TransmDialog::OnRadioCodec);
+	connect(ButtonGroupCurrentTime, &QButtonGroup::idClicked,
+			this, &TransmDialog::OnRadioCurrentTime);
+			
+		/* Line edits */
 	connect(LineEditServiceLabel, SIGNAL(textChanged(const QString&)),
         reinterpret_cast<QObject*>(this), SLOT(OnTextChangedServiceLabel(const QString&)));
 	connect(LineEditServiceID, SIGNAL(textChanged(const QString&)),
@@ -485,7 +503,7 @@ TransmDialog::~TransmDialog()
         delete pOpusCodecDlg;
 }
 
-void TransmDialog::eventClose(QCloseEvent* ce)
+void TransmDialog::closeEvent(QCloseEvent* ce)
 {
 	bCloseRequested = true;
 	if (bIsStarted)
