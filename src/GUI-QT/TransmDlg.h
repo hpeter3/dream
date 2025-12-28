@@ -67,7 +67,7 @@ public:
 	virtual ~TransmDialog();
 
 protected:
-	virtual void eventClose(QCloseEvent*);
+	void closeEvent(QCloseEvent* ce) override; 
 	void DisableAllControlsForSet();
 	void EnableAllControlsForSet();
 	void TabWidgetEnableTabs(QTabWidget* tabWidget, bool enable);

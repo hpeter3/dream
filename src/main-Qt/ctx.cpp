@@ -200,3 +200,24 @@ void CTx::SetIQOutput(int n)
 {
     tx.GetTransData()->SetIQOutput(CTransmitData::EOutFormat(n));
 }
+
+//Qt6 
+void CTx::SetInputDevice(const QString &device)
+{
+	SetInputDevice(device.toStdString());
+}
+
+void CTx::SetOutputDevice(const QString &device)
+{
+	SetOutputDevice(device.toStdString());
+}
+
+void CTx::SetTextMessage(const QString &msg)
+{
+	SetTextMessage(msg.toStdString());
+}
+
+void CTx::SetPicFileName(const QString &name, const QString &desc)
+{
+	SetPicFileName(name.toStdString(), desc.toStdString());
+}
