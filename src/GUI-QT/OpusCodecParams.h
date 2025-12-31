@@ -27,6 +27,7 @@
 \******************************************************************************/
 #pragma once
 #include <QDialog>
+#include <QAbstractButton>
 #include "ui_OpusCodecParams.h"
 #include "../Parameter.h"
 #include "../util/Settings.h"
@@ -54,9 +55,9 @@ protected:
 	virtual void	reject();
 
 public slots:
-	void OnButtonGroupChannels(int iID);
-	void OnButtonGroupBandwidth(int iID);
-	void OnButtonGroupFEC(int iID);
-	void OnButtonGroupSignal(int iID);
-	void OnButtonGroupApplication(int iID);
+    void OnButtonGroupChannels(QAbstractButton* button);
+    void OnButtonGroupBandwidth(QAbstractButton* button);
+    void OnButtonGroupFEC(QAbstractButton* button);
+    void OnButtonGroupSignal(QAbstractButton* button);
+    void OnButtonGroupApplication(QAbstractButton* button);
 };

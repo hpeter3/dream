@@ -29,7 +29,8 @@
 #include "DrmTransmitter.h"
 #include <sstream>
 #ifdef QT_MULTIMEDIA_LIB
-# include <QAudioDeviceInfo>
+#  include <QAudioDevice>
+#  include <QMediaDevices>
 #endif
 
 /* Implementation *************************************************************/
@@ -95,8 +96,7 @@ bool CDRMTransmitter::CanSoftStopExit()
         const int iSymbolPerFrame = Parameters.CellMappingTable.iNumSymPerFrame;
 
         /* Set stop requested flag */
-        const bool bStopRequested = false;//Parameters.eRunState != CParameter::RUNNING;
-
+        const bool bStopRequested = StopRequested();
 #if true
         /* Flavour 1: Stop at the frame boundary (worst case delay one frame) */
         /* The soft stop is always started at the beginning of a new frame */
@@ -176,10 +176,19 @@ CSettings* CDRMTransmitter::GetSettings()
 {
     return pSettings;
 }
+void CDRMTransmitter::RequestStop()
+{
+    m_stopRequested = true;
+}
+
+bool CDRMTransmitter::StopRequested() const
+{
+    return m_stopRequested.load();
+}
 
 void CDRMTransmitter::Init()
 {
-
+    m_stopRequested = false;
    /* Fetch new sample rate if any */
     Parameters.FetchNewSampleRate();
 

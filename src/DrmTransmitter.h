@@ -42,6 +42,7 @@
 #include "sound/soundinterface.h"
 #include "DrmTransceiver.h"
 #include "Parameter.h"
+#include <atomic>
 
 /* Classes ********************************************************************/
 class CDRMTransmitter : public CDRMTransceiver
@@ -89,10 +90,13 @@ public:
     virtual CParameter*				GetParameters() {return &Parameters; }
     void Run();
     void Close() {ReadData.Stop(); TransmitData.Stop(); }
+    void RequestStop();
+    bool StopRequested() const;
 
 protected:
     bool CanSoftStopExit();
     void InitSoftStop() { iSoftStopSymbolCount=0; }
+    std::atomic<bool> m_stopRequested{false};
 
     std::string indev;
     std::string outdev;

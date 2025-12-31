@@ -449,7 +449,7 @@ if(ENABLE_FDK_AAC)
 endif()
 
 if(ENABLE_OPUS)
-    add_compile_definitions(HAVE_LIBOPUS USE_OPUS_LIBRARY)
+    add_compile_definitions(HAVE_LIBOPUS)
     if(UNIX)
         list(APPEND EXTRA_LIBS "-lopus")
     endif()
