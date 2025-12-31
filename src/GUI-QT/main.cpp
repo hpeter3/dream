@@ -151,7 +151,7 @@ main(int argc, char **argv)
             tx.LoadSettings(); // load settings after GUI initialised so LoadSettings signals get captured
             /* Show dialog */
 			pMainDlg->show();
-            tx.start();
+            //tx.start();
 			app.exec();
             tx.SaveSettings();
         }

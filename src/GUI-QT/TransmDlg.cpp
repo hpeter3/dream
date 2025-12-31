@@ -468,16 +468,19 @@ TransmDialog::TransmDialog(CTx& ntx, QWidget* parent)
 			this, &TransmDialog::OnRadioCurrentTime);
 			
 		/* Line edits */
-	connect(LineEditServiceLabel, SIGNAL(textChanged(const QString&)),
-        reinterpret_cast<QObject*>(this), SLOT(OnTextChangedServiceLabel(const QString&)));
-	connect(LineEditServiceID, SIGNAL(textChanged(const QString&)),
-        reinterpret_cast<QObject*>(this), SLOT(OnTextChangedServiceID(const QString&)));
-	connect(LineEditSndCrdIF, SIGNAL(textChanged(const QString&)),
-        reinterpret_cast<QObject*>(this), SLOT(OnTextChangedSndCrdIF(const QString&)));
+    connect(LineEditServiceLabel, &QLineEdit::textChanged,
+            this, &TransmDialog::OnTextChangedServiceLabel);
+
+    connect(LineEditServiceID, &QLineEdit::textChanged,
+            this, &TransmDialog::OnTextChangedServiceID);
+
+    connect(LineEditSndCrdIF, &QLineEdit::textChanged,
+            this, &TransmDialog::OnTextChangedSndCrdIF);
+
 
 	/* Timers */
-    connect(&Timer, SIGNAL(timeout()), reinterpret_cast<QObject*>(this), SLOT(OnTimer()));
-    connect(&TimerStop, SIGNAL(timeout()), reinterpret_cast<QObject*>(this), SLOT(OnTimerStop()));
+    connect(&Timer, &QTimer::timeout, this, &TransmDialog::OnTimer);
+    connect(&TimerStop, &QTimer::timeout, this, &TransmDialog::OnTimerStop);
 
     /* System tray setup */
     pSysTray = CSysTray::Create(reinterpret_cast<QWidget*>(this),

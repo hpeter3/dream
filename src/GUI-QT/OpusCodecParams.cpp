@@ -46,7 +46,7 @@ OpusCodecParams::OpusCodecParams(CSettings& Settings, CParameter& Parameters,
 	iShortID(iShortID), bWasVisible(false), bLastPositionValid(false)
 {
 	setAttribute(Qt::WA_QuitOnClose, false);
-	setupUi(this);
+    setupUi(this);
 
 	/* Recover window size and position */
 	CWinGeom s;
@@ -117,16 +117,21 @@ OpusCodecParams::OpusCodecParams(CSettings& Settings, CParameter& Parameters,
 	Parameters.Unlock();
 
 	/* Connections */
-	connect(ButtonGroupChannels, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnButtonGroupChannels(int)));
-	connect(ButtonGroupBandwidth, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnButtonGroupBandwidth(int)));
-	connect(ButtonGroupFEC, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnButtonGroupFEC(int)));
-	connect(ButtonGroupSignal, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnButtonGroupSignal(int)));
-	connect(ButtonGroupApplication, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnButtonGroupApplication(int)));
+    connect(ButtonGroupChannels, &QButtonGroup::buttonClicked,
+            this, &OpusCodecParams::OnButtonGroupChannels);
+
+    connect(ButtonGroupBandwidth, &QButtonGroup::buttonClicked,
+            this, &OpusCodecParams::OnButtonGroupBandwidth);
+
+    connect(ButtonGroupFEC, &QButtonGroup::buttonClicked,
+            this, &OpusCodecParams::OnButtonGroupFEC);
+
+    connect(ButtonGroupSignal, &QButtonGroup::buttonClicked,
+            this, &OpusCodecParams::OnButtonGroupSignal);
+
+    connect(ButtonGroupApplication, &QButtonGroup::buttonClicked,
+            this, &OpusCodecParams::OnButtonGroupApplication);
+
 }
 
 OpusCodecParams::~OpusCodecParams()
@@ -154,8 +159,9 @@ void OpusCodecParams::reject()
 	QDialog::reject();
 }
 
-void OpusCodecParams::OnButtonGroupChannels(int iID)
+void OpusCodecParams::OnButtonGroupChannels(QAbstractButton* button)
 {
+    int iID = ButtonGroupChannels->id(button);
 	iID = -iID - 2; // TODO understand why
 	CAudioParam::EOPUSChan eOPUSChan;
 	switch (iID)
@@ -174,8 +180,9 @@ void OpusCodecParams::OnButtonGroupChannels(int iID)
 	Parameters.Unlock();
 }
 
-void OpusCodecParams::OnButtonGroupBandwidth(int iID)
+void OpusCodecParams::OnButtonGroupBandwidth(QAbstractButton* button)
 {
+    int iID = ButtonGroupChannels->id(button);
 	iID = -iID - 2; // TODO understand why
 	CAudioParam::EOPUSBandwidth eOPUSBandwidth;
 	switch (iID)
@@ -203,8 +210,9 @@ void OpusCodecParams::OnButtonGroupBandwidth(int iID)
 	Parameters.Unlock();
 }
 
-void OpusCodecParams::OnButtonGroupFEC(int iID)
+void OpusCodecParams::OnButtonGroupFEC(QAbstractButton* button)
 {
+    int iID = ButtonGroupSignal->id(button);
 	iID = -iID - 2; // TODO understand why
 	bool bOPUSForwardErrorCorrection;
 	switch (iID)
@@ -223,8 +231,9 @@ void OpusCodecParams::OnButtonGroupFEC(int iID)
 	Parameters.Unlock();
 }
 
-void OpusCodecParams::OnButtonGroupSignal(int iID)
+void OpusCodecParams::OnButtonGroupSignal(QAbstractButton* button)
 {
+    int iID = ButtonGroupSignal->id(button);
 	iID = -iID - 2; // TODO understand why
 	CAudioParam::EOPUSSignal eOPUSSignal;
 	switch (iID)
@@ -244,8 +253,9 @@ void OpusCodecParams::OnButtonGroupSignal(int iID)
 	Parameters.Unlock();
 }
 
-void OpusCodecParams::OnButtonGroupApplication(int iID)
+void OpusCodecParams::OnButtonGroupApplication(QAbstractButton* button)
 {
+    int iID = ButtonGroupSignal->id(button);
 	iID = -iID - 2; // TODO understand why
 	CAudioParam::EOPUSApplication eOPUSApplication;
 	switch (iID)

@@ -149,7 +149,7 @@ opus_encoder *opusEncOpen(
 
 	enc->samples_per_channel = OPUS_PCM_FRAME_SIZE;
 	enc->samplerate = sampleRate;
-	enc->channels   = numChannels;
+    enc->channels   = numChannels;
 	enc->bytes_per_frame = bytes_per_frame;
 	int frequency = (int)((float)enc->samplerate / (float)enc->samples_per_channel);
 	int frame_extra_bytes = CRC_BYTES;
@@ -290,15 +290,15 @@ void opusEncSetParam(opus_encoder *enc,
 	{
 	case CAudioParam::OC_MONO:
 		value = 1;
-		break;
+        break;
 	default:
-	case CAudioParam::OC_STEREO:
-		value = 2;
-		break;
-	}
+    case CAudioParam::OC_STEREO:
+        value = 2;
+        break;
+    }
 	ret = opus_encoder_ctl(enc->oe, OPUS_SET_FORCE_CHANNELS(value));
 	if (ret != OPUS_OK)
-		EPRINTF("opusEncSetParam: OPUS_SET_FORCE_CHANNELS returned: %s\n", opus_strerror(ret));
+        EPRINTF("opusEncSetParam: OPUS_SET_FORCE_CHANNELS returned: %s\n", opus_strerror(ret));
 
 	/* Bandwidth */
 	switch (AudioParam.eOPUSBandwidth)
@@ -527,7 +527,7 @@ OpusCodec::OpusCodec() :
 		if (!hOpusLib)
 			cerr << "No usable Opus library found" << endl;
 		else
-			cerr << "Got Opus library" << endl;
+            cerr << "Got Opus library" << endl;
 	}
 #endif
 }

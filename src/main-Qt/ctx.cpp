@@ -94,7 +94,9 @@ void CTx::Restart()
 void CTx::Stop()
 {
     eRunState = STOP_REQUESTED;
+    tx.RequestStop();
 }
+
 
 CSettings* CTx::GetSettings()
 {
