@@ -7,11 +7,26 @@ Currently this program is only tested on Fedora 42. \
 At the time of writing (December 15th 2025) this software is in the Qt5 to Qt6 transition phase, plus additional compile time fixes (including the "DEBUG2025" fixes)
 
 # Prerequisites (Qt6)
-Debian 13:
+Debian 13: \
+Enable the experimental repo:
 ```sh
-Qwt on Debian 13 is broken, dream won't compile.
+https://wiki.debian.org/DebianExperimental
 ```
-Fedora 42:
+Enable the contrib and non-free repos:
+```sh
+https://wiki.debian.org/SourcesList#debian.sources
+```
+Install the following packages:
+```sh
+sudo apt-get install git build-essential cmake cmake-qt-gui qt6-base-dev qt6-base-dev-tools qt6-networkauth-dev qt6-declarative-dev qt6-declarative-dev-tools libqt6network6 qt6-webengine-dev libgps-dev libsndfile-dev libpcap-dev libfftw3-dev libfaad-dev libfaac-dev libpulse-dev libhamlib-dev libfdk-aac-dev libspeexdsp-dev speex libspeexdsp1 libsoapysdr-dev portaudio19-dev gpsd pipewire-alsa
+```
+```sh
+sudo apt-get install libqt6svg6*
+```
+```sh
+sudo apt -t experimental install libqwt-qt6-dev
+```
+Fedora 42: \
 Enable RPM Fusion at https://rpmfusion.org/Configuration \
 Configure multimedia packages at https://rpmfusion.org/Howto/Multimedia
 
@@ -45,6 +60,5 @@ Transmitter:
 ./dream -t
 ```
 # Known bugs
-- Dream transmitter starting immediately
-- Dream transmitter doesn't start when compiled with CONFIG+=alsa
-- Compile-time errors related to Qwt on Debian 13
+- Dream transmitter AAC and Opus codecs are broken (the distro packages are probably broken or have missing features, TODO!)
+- Compile-time errors related to Qwt on Debian 13 (use libqwt version 6.3 or later, it's in the experimental repos)
