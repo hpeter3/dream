@@ -97,7 +97,7 @@ signals:
     void NowNext(QString);
 
 public slots:
-    void on_channel_activated(const QString&);
+    void on_channel_activated(int index);
     void on_dateEdit_dateChanged(const QDate&);
     void OnTimer();
 };

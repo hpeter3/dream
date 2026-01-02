@@ -115,8 +115,8 @@ public slots:
 	void OnHeaderClicked(int c);
 	void on_actionGetUpdate_triggered();
 	void on_ListViewStations_itemSelectionChanged();
-	void on_ComboBoxFilterTarget_activated(const QString&);
-	void on_ComboBoxFilterCountry_activated(const QString&);
-	void on_ComboBoxFilterLanguage_activated(const QString&);
+    void on_ComboBoxFilterTarget_activated(int index);
+    void on_ComboBoxFilterCountry_activated(int index);
+    void on_ComboBoxFilterLanguage_activated(int index);
 };
 #endif

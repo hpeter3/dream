@@ -39,7 +39,6 @@
 #include <QToolTip>
 #include <QButtonGroup>
 #include <QPushButton>
-#include <QCheckBox>
 #include <QFileDialog>
 #include <QSlider>
 #include <QLayout>
@@ -73,16 +72,36 @@ AnalogDemDlg::AnalogDemDlg(CRx& nrx, CSettings& Settings,
 	menuBar()->insertMenu(menu_View->menuAction(), pFileMenu);
 	menu_Settings->addMenu(pSoundCardMenu);
 
-	connect(action_Stations_Dialog, SIGNAL(triggered()), this, SIGNAL(ViewStationsDlg()));
-	connect(action_Live_Schedule_Dialog, SIGNAL(triggered()), this, SIGNAL(ViewLiveScheduleDlg()));
-	connect(actionExit, SIGNAL(triggered()), this, SLOT(close()));
-	connect(actionAM, SIGNAL(triggered()), this, SIGNAL(NewAMAcquisition()));
-	connect(actionFM, SIGNAL(triggered()), this, SLOT(OnSwitchToFM()));
-	connect(actionDRM, SIGNAL(triggered()), this, SLOT(OnSwitchToDRM()));
-    connect(pFileMenu, SIGNAL(soundFileChanged(QString)), this, SLOT(OnSoundFileChanged(QString)));
-    connect(pSoundCardMenu, SIGNAL(soundSampleRateChanged(int)), this, SLOT(OnSampleRateChanged(int)));
-	connect(actionAbout_Dream, SIGNAL(triggered()), this, SLOT(OnHelpAbout()));
-	connect(actionWhats_This, SIGNAL(triggered()), this, SLOT(OnWhatsThis()));
+    connect(action_Stations_Dialog, &QAction::triggered,
+            this, &AnalogDemDlg::ViewStationsDlg);
+
+    connect(action_Live_Schedule_Dialog, &QAction::triggered,
+            this, &AnalogDemDlg::ViewLiveScheduleDlg);
+
+    connect(actionExit, &QAction::triggered,
+            this, &AnalogDemDlg::close);
+
+    connect(actionAM, &QAction::triggered,
+            this, &AnalogDemDlg::NewAMAcquisition);
+
+    connect(actionFM, &QAction::triggered,
+            this, &AnalogDemDlg::OnSwitchToFM);
+
+    connect(actionDRM, &QAction::triggered,
+            this, &AnalogDemDlg::OnSwitchToDRM);
+
+    connect(pFileMenu, &CFileMenu::soundFileChanged,
+            this, &AnalogDemDlg::OnSoundFileChanged);
+
+    connect(pSoundCardMenu, &CSoundCardSelMenu::soundSampleRateChanged,
+            this, &AnalogDemDlg::OnSampleRateChanged);
+
+    connect(actionAbout_Dream, &QAction::triggered,
+            this, &AnalogDemDlg::OnHelpAbout);
+
+    connect(actionWhats_This, &QAction::triggered,
+            this, &AnalogDemDlg::OnWhatsThis);
+
 	SliderBandwidth->setTickPosition(QSlider::TicksBothSides);
 	MainPlot = new CDRMPlot(nullptr, plot);
 
@@ -143,45 +162,55 @@ AnalogDemDlg::AnalogDemDlg(CRx& nrx, CSettings& Settings,
 	UpdateControls();
 
 
-	/* Connect controls ----------------------------------------------------- */
-	connect(ButtonDRM, SIGNAL(clicked()),
-		this, SLOT(OnSwitchToDRM()));
-	connect(ButtonAMSS, SIGNAL(clicked()),
-		&AMSSDlg, SLOT(show()));
-	connect(ButtonWaterfall, SIGNAL(clicked()),
-		this, SLOT(OnButtonWaterfall()));
-	connect(MainPlot, SIGNAL(xAxisValSet(double)),
-		this, SLOT(OnChartxAxisValSet(double)));
+    /* Connect controls ----------------------------------------------------- */
+    connect(ButtonDRM, &QPushButton::clicked,
+            this, &AnalogDemDlg::OnSwitchToDRM);
 
-	/* Button groups */
-	connect(ButtonGroupDemodulation, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnRadioDemodulation(int)));
-	connect(ButtonGroupAGC, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnRadioAGC(int)));
-	connect(ButtonGroupNoiseReduction, SIGNAL(buttonClicked(int)),
-		this, SLOT(OnRadioNoiRed(int)));
+    connect(ButtonAMSS, &QPushButton::clicked,
+            &AMSSDlg, &QDialog::show);
 
-	/* Slider */
-	connect(SliderBandwidth, SIGNAL(valueChanged(int)),
-		this, SLOT(OnSliderBWChange(int)));
+    connect(ButtonWaterfall, &QPushButton::clicked,
+            this, &AnalogDemDlg::OnButtonWaterfall);
 
-	/* Check boxes */
-	connect(CheckBoxMuteAudio, SIGNAL(clicked()),
-		this, SLOT(OnCheckBoxMuteAudio()));
-	connect(CheckBoxSaveAudioWave, SIGNAL(clicked()),
-		this, SLOT(OnCheckSaveAudioWAV()));
-	connect(CheckBoxAutoFreqAcq, SIGNAL(clicked()),
-		this, SLOT(OnCheckAutoFreqAcq()));
-	connect(CheckBoxPLL, SIGNAL(clicked()),
-		this, SLOT(OnCheckPLL()));
+    connect(MainPlot, &CDRMPlot::xAxisValSet,
+            this, &AnalogDemDlg::OnChartxAxisValSet);
 
-	/* Timers */
-	connect(&Timer, SIGNAL(timeout()),
-		this, SLOT(OnTimer()));
-	connect(&TimerPLLPhaseDial, SIGNAL(timeout()),
-		this, SLOT(OnTimerPLLPhaseDial()));
-	connect(&TimerClose, SIGNAL(timeout()),
-		this, SLOT(OnTimerClose()));
+    /* Button groups — Qt6 FIX: buttonClicked(int) → idClicked(int) */
+    connect(ButtonGroupDemodulation, &QButtonGroup::idClicked,
+            this, &AnalogDemDlg::OnRadioDemodulation);
+
+    connect(ButtonGroupAGC, &QButtonGroup::idClicked,
+            this, &AnalogDemDlg::OnRadioAGC);
+
+    connect(ButtonGroupNoiseReduction, &QButtonGroup::idClicked,
+            this, &AnalogDemDlg::OnRadioNoiRed);
+
+    /* Slider */
+    connect(SliderBandwidth, &QSlider::valueChanged,
+            this, &AnalogDemDlg::OnSliderBWChange);
+
+    /* Check boxes */
+    connect(CheckBoxMuteAudio, &QCheckBox::clicked,
+            this, &AnalogDemDlg::OnCheckBoxMuteAudio);
+
+    connect(CheckBoxSaveAudioWave, &QCheckBox::clicked,
+            this, &AnalogDemDlg::OnCheckSaveAudioWAV);
+
+    connect(CheckBoxAutoFreqAcq, &QCheckBox::clicked,
+            this, &AnalogDemDlg::OnCheckAutoFreqAcq);
+
+    connect(CheckBoxPLL, &QCheckBox::clicked,
+            this, &AnalogDemDlg::OnCheckPLL);
+
+    /* Timers */
+    connect(&Timer, &QTimer::timeout,
+            this, &AnalogDemDlg::OnTimer);
+
+    connect(&TimerPLLPhaseDial, &QTimer::timeout,
+        this, &AnalogDemDlg::OnTimerPLLPhaseDial);
+
+    connect(&TimerClose, &QTimer::timeout,
+            this, &AnalogDemDlg::OnTimerClose);
 
 	/* Don't activate real-time timers, wait for show event */
 }
@@ -816,11 +845,13 @@ CAMSSDlg::CAMSSDlg(CRx& NDRMR, CSettings& Settings, QWidget* parent) :
 
 
 	/* Connect controls ----------------------------------------------------- */
-	/* Timers */
-	connect(&Timer, SIGNAL(timeout()),
-		this, SLOT(OnTimer()));
-	connect(&TimerPLLPhaseDial, SIGNAL(timeout()),
-		this, SLOT(OnTimerPLLPhaseDial()));
+    /* Timers */
+    connect(&Timer, &QTimer::timeout,
+            this, &CAMSSDlg::OnTimer);
+
+    connect(&TimerPLLPhaseDial, &QTimer::timeout,
+            this, &CAMSSDlg::OnTimerPLLPhaseDial);
+
 }
 
 void CAMSSDlg::eventHide(QHideEvent*)
