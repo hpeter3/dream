@@ -362,7 +362,9 @@ LiveScheduleDlg::LiveScheduleDlg(CRx& nrx, CSettings& Settings,
     connect(actionClose, SIGNAL(triggered()), SLOT(close()));
     connect(actionShowAllStations, SIGNAL(triggered()), showMapper, SLOT(map()));
     connect(actionShowOnlyActiveStations, SIGNAL(triggered()), showMapper, SLOT(map()));
-    connect(showMapper, SIGNAL(mapped(int)), this, SLOT(OnShowStationsMenu(int)));
+    /* Deprecated, TODO */
+    /* mapped() -> mappedInt() minimal fix */
+    connect(showMapper, SIGNAL(mappedInt(int)), this, SLOT(OnShowStationsMenu(int)));
     previewGroup->addAction(actionDisabled);
     previewMapper->setMapping(actionDisabled, 0);
     previewGroup->addAction(action5minutes);
@@ -375,7 +377,9 @@ LiveScheduleDlg::LiveScheduleDlg(CRx& nrx, CSettings& Settings,
     connect(action5minutes, SIGNAL(triggered()), previewMapper, SLOT(map()));
     connect(action15minutes, SIGNAL(triggered()), previewMapper, SLOT(map()));
     connect(action30minutes, SIGNAL(triggered()), previewMapper, SLOT(map()));
-    connect(previewMapper, SIGNAL(mapped(int)), this, SLOT(OnShowPreviewMenu(int)));
+    /* Deprecated, TODO */
+    /* mapped() -> mappedInt() minimal fix */
+    connect(previewMapper, SIGNAL(mappedInt(int)), this, SLOT(OnShowPreviewMenu(int)));
 
     connect(buttonOk,  SIGNAL(clicked()), this, SLOT(close()));
     //connect(actionGetUpdate, SIGNAL(triggered()), this, SLOT(OnGetUpdate()));
