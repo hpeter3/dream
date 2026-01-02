@@ -4,8 +4,7 @@
 An experimental Qt6 port of the Dream AM/DRM Receiver program for GNU/Linux. \
 Source code of the original project: https://sourceforge.net/p/drm/code/HEAD/tree/branches/dream-ollie-deployed/ \
 Currently this program is only tested on Fedora 42. \
-At the time of writing (December 15th 2025) this software is in the Qt5 to Qt6 transition phase, plus additional compile time fixes (including the "DEBUG2025" fixes)
-
+Status as of January 2nd 2026: There's no need for the Qt5 compatibility APIs anymore, however lots of deprecated Qt4 and Qt5 code remains, TODO! \
 # Prerequisites (Qt6)
 Debian 13: \
 Enable the experimental repo:
