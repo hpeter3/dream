@@ -59,3 +59,6 @@ cmake_install.cmake
 *.exe
 *.out
 *.app
+
+#Qt Creator junk
+CMakeLists.txt.user

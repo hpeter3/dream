@@ -49,10 +49,15 @@ EPGDlg::EPGDlg(CRx& nrx, CSettings& Settings, QWidget* parent):
     setupUi(this);
 
     /* auto resize of the programme name column */
-    dateEdit->setDate(QDate::currentDate());
-    connect(channel, SIGNAL(activated(const QString&)), this , SLOT(on_channel_activated(const QString&)));
-    connect(dateEdit, SIGNAL(dateChanged(const QDate&)), this , SLOT(on_dateEdit_dateChanged(const QDate&)));
-    connect(&Timer, SIGNAL(timeout()), this, SLOT(OnTimer()));
+    connect(channel, &QComboBox::activated,
+            this, &EPGDlg::on_channel_activated);
+
+    connect(dateEdit, &QDateEdit::dateChanged,
+            this, &EPGDlg::on_dateEdit_dateChanged);
+
+    connect(&Timer, &QTimer::timeout,
+            this, &EPGDlg::OnTimer);
+
 
     TextEPGDisabled->hide();
 }
@@ -149,7 +154,7 @@ void EPGDlg::on_dateEdit_dateChanged(const QDate&)
     select();
 }
 
-void EPGDlg::on_channel_activated(const QString&)
+void EPGDlg::on_channel_activated(int index)
 {
     epg.progs.clear ();
     select();

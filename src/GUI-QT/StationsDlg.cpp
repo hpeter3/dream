@@ -200,8 +200,9 @@ void StationsDlg::OnShowPreviewMenu(int iID)
     UpdateTransmissionStatus();
 }
 
-void StationsDlg::on_ComboBoxFilterTarget_activated(const QString& s)
+void StationsDlg::on_ComboBoxFilterTarget_activated(int index)
 {
+    QString s = ComboBoxFilterTarget->itemText(index);
 	if (schedule.GetSchedMode() == CSchedule::SM_DRM)
 		schedule.targetFilterdrm = s;
 	else
@@ -209,8 +210,9 @@ void StationsDlg::on_ComboBoxFilterTarget_activated(const QString& s)
     UpdateTransmissionStatus();
 }
 
-void StationsDlg::on_ComboBoxFilterCountry_activated(const QString& s)
+void StationsDlg::on_ComboBoxFilterCountry_activated(int index)
 {
+    QString s = ComboBoxFilterCountry->itemText(index);
 	if (schedule.GetSchedMode() == CSchedule::SM_DRM)
 		schedule.countryFilterdrm = s;
 	else
@@ -218,8 +220,9 @@ void StationsDlg::on_ComboBoxFilterCountry_activated(const QString& s)
     UpdateTransmissionStatus();
 }
 
-void StationsDlg::on_ComboBoxFilterLanguage_activated(const QString& s)
+void StationsDlg::on_ComboBoxFilterLanguage_activated(int index)
 {
+    QString s = ComboBoxFilterLanguage->itemText(index);
 	if (schedule.GetSchedMode() == CSchedule::SM_DRM)
 		schedule.languageFilterdrm = s;
 	else
