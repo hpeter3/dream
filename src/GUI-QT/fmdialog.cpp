@@ -56,14 +56,14 @@ FMDialog::FMDialog(CRx& nrx, CSettings& Settings,
 	/* Add file and sound card menu */
 	menuBar()->insertMenu(menu_View->menuAction(), pFileMenu);
 	menu_Settings->addMenu(pSoundCardMenu);
+    connect(actionTune,        &QAction::triggered, this, &FMDialog::OnTune);
+    connect(actionExit,        &QAction::triggered, this, &FMDialog::close);
+    connect(actionAM,          &QAction::triggered, this, &FMDialog::OnSwitchToAM);
+    connect(actionDRM,         &QAction::triggered, this, &FMDialog::OnSwitchToDRM);
+    connect(actionDisplayColor,&QAction::triggered, this, &FMDialog::OnMenuSetDisplayColor);
+    connect(actionAbout_Dream, &QAction::triggered, this, &FMDialog::OnHelpAbout);
+    connect(actionWhats_This,  &QAction::triggered, this, &FMDialog::OnWhatsThis);
 
-	connect(actionTune, SIGNAL(triggered()), this, SLOT(OnTune()));
-	connect(actionExit, SIGNAL(triggered()), this, SLOT(close()));
-	connect(actionAM, SIGNAL(triggered()), this, SLOT(OnSwitchToAM()));
-	connect(actionDRM, SIGNAL(triggered()), this, SLOT(OnSwitchToDRM()));
-	connect(actionDisplayColor, SIGNAL(triggered()), this, SLOT(OnMenuSetDisplayColor()));
-	connect(actionAbout_Dream, SIGNAL(triggered()), this, SLOT(OnHelpAbout()));
-	connect(actionWhats_This, SIGNAL(triggered()), this, SLOT(OnWhatsThis()));
 
 	/* Reset text */
 	LabelBitrate->setText("");
@@ -104,10 +104,9 @@ FMDialog::FMDialog(CRx& nrx, CSettings& Settings,
 	CLED_MSC->SetUpdateTime(600);
 
 	/* Connect timers */
-	connect(&Timer, SIGNAL(timeout()),
-		this, SLOT(OnTimer()));
-	connect(&TimerClose, SIGNAL(timeout()),
-		this, SLOT(OnTimerClose()));
+    connect(&Timer,      &QTimer::timeout, this, &FMDialog::OnTimer);
+    connect(&TimerClose, &QTimer::timeout, this, &FMDialog::OnTimerClose);
+
 
 	/* Activate real-time timers */
  	Timer.start(GUI_CONTROL_UPDATE_TIME);

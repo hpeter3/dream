@@ -34,6 +34,7 @@
 #include <QEvent>
 #include <QShowEvent>
 #include <QCloseEvent>
+#include <QObject>
 #include "SlideShowViewer.h"
 #include "JLViewer.h"
 #ifdef QT_WEBENGINE_LIB
@@ -154,10 +155,32 @@ FDRMDialog::FDRMDialog(CTRx* pRx, CSettings& Settings, QWidget* parent)
     plotStyleMapper->setMapping(actionBlueWhite, 0);
     plotStyleMapper->setMapping(actionGreenBlack, 1);
     plotStyleMapper->setMapping(actionBlackGrey, 2);
+
+    /* Old Qt5 implementation */
+    /*
     connect(actionBlueWhite, SIGNAL(triggered()), plotStyleMapper, SLOT(map()));
     connect(actionGreenBlack, SIGNAL(triggered()), plotStyleMapper, SLOT(map()));
     connect(actionBlackGrey, SIGNAL(triggered()), plotStyleMapper, SLOT(map()));
-    connect(plotStyleMapper, SIGNAL(mapped(int)), this, SIGNAL(plotStyleChanged(int)));
+    connect(plotStyleMapper, SIGNAL(mappedInt(int)), this, SIGNAL(plotStyleChanged(int)));
+     */
+    /* These 3 might cause breakage, Qt6 deprecated QSignalMapper and the Qt5 implementation */
+    connect(actionBlueWhite, &QAction::triggered, this, [this]() {
+        emit plotStyleChanged(0);
+    });
+
+    connect(actionGreenBlack, &QAction::triggered, this, [this]() {
+        emit plotStyleChanged(1);
+    });
+
+    connect(actionBlackGrey, &QAction::triggered, this, [this]() {
+        emit plotStyleChanged(2);
+    });
+
+    connect(plotStyleMapper,
+            &QSignalMapper::mappedInt,
+            this,
+            &FDRMDialog::plotStyleChanged);
+
     switch(getSetting("plotstyle", int(0), true))
     {
     case 0:
@@ -183,8 +206,11 @@ FDRMDialog::FDRMDialog(CTRx* pRx, CSettings& Settings, QWidget* parent)
     pButtonGroup->addButton(PushButtonService2, 1);
     pButtonGroup->addButton(PushButtonService3, 2);
     pButtonGroup->addButton(PushButtonService4, 3);
-    connect(pButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(OnSelectAudioService(int)));
-    connect(pButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(OnSelectDataService(int)));
+    connect(pButtonGroup, &QButtonGroup::idClicked,
+            this, &FDRMDialog::OnSelectAudioService);
+
+    connect(pButtonGroup, &QButtonGroup::idClicked,
+            this, &FDRMDialog::OnSelectDataService);
 
     connect(pFMDlg, SIGNAL(About()), this, SLOT(OnHelpAbout()));
     connect(pAnalogDemDlg, SIGNAL(About()), this, SLOT(OnHelpAbout()));
