@@ -48,6 +48,7 @@ qmake6 CONFIG+=alsa CONFIG+=sound
 make -j8
 ```
 # Transmitter AAC fix (WARNING: This method uses an older release of the FAAD and FAAC libraries, expect incompatibilities and vulnerabilities!!!!) [ source: https://gist.github.com/1zxLi/42e436e6ee638037d9e3060c808708fa ]
+## Remove all libfaad,libfaac and related packages (don't remove faad2 itself) 
 ## Build and install FAAD2 library
 ```sh
 wget http://downloads.sourceforge.net/faac/faad2-2.7.tar.gz
