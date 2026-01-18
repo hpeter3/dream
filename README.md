@@ -47,6 +47,35 @@ qmake6 (alsa OR portaudio OR pulseaudio AND CONFIG+=sound):
 qmake6 CONFIG+=alsa CONFIG+=sound
 make -j8
 ```
+# Transmitter AAC fix (WARNING: This method uses an older release of the FAAD and FAAC libraries, expect incompatibilities and vulnerabilities!!!!) [ source: https://gist.github.com/1zxLi/42e436e6ee638037d9e3060c808708fa ]
+## Build and install FAAD2 library
+
+wget http://downloads.sourceforge.net/faac/faad2-2.7.tar.gz
+tar zxf faad2-2.7.tar.gz
+cd faad2-2.7
+. bootstrap
+./configure --enable-shared --without-xmms --with-drm --without-mpeg4ip
+make $MAKE_ARGS
+sudo cp include/faad.h include/neaacdec.h /usr/include
+sudo cp libfaad/.libs/libfaad.so.2.0.0 /usr/local/lib/libfaad2_drm.so.2.0.0
+sudo ln -s /usr/local/lib/libfaad2_drm.so.2.0.0 /usr/local/lib/libfaad2_drm.so.2
+sudo ln -s /usr/local/lib/libfaad2_drm.so.2.0.0 /usr/local/lib/libfaad2_drm.so
+cd ..
+
+## Build and install FAAC library
+
+wget http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+tar zxf faac-1.28.tar.gz
+cd faac-1.28
+. bootstrap
+./configure --with-pic --enable-shared --without-mp4v2 --enable-drm
+make $MAKE_ARGS
+sudo cp include/faaccfg.h  include/faac.h /usr/include
+sudo cp libfaac/.libs/libfaac.so.0.0.0 /usr/local/lib/libfaac_drm.so.0.0.0
+sudo ln -s /usr/local/lib/libfaac_drm.so.0.0.0 /usr/local/lib/libfaac_drm.so.0
+sudo ln -s /usr/local/lib/libfaac_drm.so.0.0.0 /usr/local/lib/libfaac_drm.so
+cd ..
+
 # Running the program
 
 Receiver:
