@@ -44,12 +44,29 @@ yay -S qwt-qt6
 >sudo pacman -S pipewire-pulse pipewire-alsa
 >```
 # Compiling with CMake (this is an example)
+### Dream with GUI
 ```sh
 mkdir build
 cmake -S . -B build -DUSE_QT=ON -DENABLE_SNDFILE=ON -DENABLE_SPEEXDSP=ON -DENABLE_ALSA=ON -DENABLE_QWT=ON -DENABLE_GPS=ON -DENABLE_FDK_AAC=ON -DENABLE_OPUS=ON -DENABLE_HAMLIB=ON -DCMAKE_BUILD_TYPE=Release
 cmake --build build -- -j8
 cd build
 ```
+### CLI Dream (with QTConsole)
+```sh
+mkdir build
+cmake -S . -B build -DUSE_QT=ON -DQTCONSOLE=ON -DENABLE_SNDFILE=ON -DENABLE_SPEEXDSP=ON -DENABLE_ALSA=ON -DENABLE_QWT=ON -DENABLE_GPS=ON -DENABLE_FDK_AAC=ON -DENABLE_OPUS=ON -DENABLE_HAMLIB=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build -- -j8
+cd build
+```
+### CLI Dream (without QTConsole)
+```sh
+mkdir build
+cmake -S . -B build -DUSE_QT=ON -DCONSOLE=ON -DENABLE_SNDFILE=ON -DENABLE_SPEEXDSP=ON -DENABLE_ALSA=ON -DENABLE_QWT=ON -DENABLE_GPS=ON -DENABLE_FDK_AAC=ON -DENABLE_OPUS=ON -DENABLE_HAMLIB=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build -- -j8
+cd build
+```
+
+
 For a complete list of CMake options, please refer to CMakeLists.txt.
 
 # Compiling with qmake
@@ -99,15 +116,20 @@ cd ..
 [ source: https://gist.github.com/1zxLi/42e436e6ee638037d9e3060c808708fa ]
 # Running the program
 
-Receiver:
+### Receiver:
 ```sh
 ./dream
 ```
 
-Transmitter:
+### Transmitter:
 ```sh
 ./dream -t
 ```
+### Extra options:
+```sh
+./dream -h
+```
+
 # Known bugs
 - Dream transmitter AAC and Opus codecs are broken (the distro packages are probably broken or have missing features)
 - Compile-time errors related to Qwt on Debian 13 (use libqwt version 6.3 or later, it's in the experimental repos)
