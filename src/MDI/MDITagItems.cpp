@@ -1066,13 +1066,14 @@ CTagItemGeneratorGPS::GenTag(bool bIsValid, gps_data_t& gps_data)	// Long/Lat in
 	{
 		uint32_t source = 0xff; // GPS_SOURCE_NOT_AVAILABLE
 		PrepareTag(26 * SIZEOF__BYTE);
-		if(gps_data.set&STATUS_SET) {
+		//DEBUG2025 struct gps_data_t has no member name status -> will fix later
+		/*if(gps_data.set&STATUS_SET) {
             switch(gps_data.status) {
 			case 0: source = 3; break; // manual
 			case 1: source = 1; break; // gps
 			case 2: source = 2; break; // differential
 			}
-		}
+		}*/
 		Enqueue(source, SIZEOF__BYTE);
 
 		if (gps_data.set&SATELLITE_SET)
@@ -1159,8 +1160,10 @@ CTagItemGeneratorGPS::GenTag(bool bIsValid, gps_data_t& gps_data)	// Long/Lat in
 			Enqueue((uint32_t) 0xff, SIZEOF__BYTE);
 		}
 
-		if (gps_data.set&TIME_SET)
+		//DEBUG2025: invalid cast from timespec (struct) to time_t (long int) -> might fix later
+		/*if (gps_data.set&TIME_SET)
 		{
+
             time_t time = (time_t) gps_data.fix.time;
 			struct tm * ptm;
 			ptm = gmtime ( &time );
@@ -1170,8 +1173,10 @@ CTagItemGeneratorGPS::GenTag(bool bIsValid, gps_data_t& gps_data)	// Long/Lat in
 			Enqueue(1900+ptm->tm_year, 2*SIZEOF__BYTE);
 			Enqueue((uint32_t) ptm->tm_mon+1, SIZEOF__BYTE);
 			Enqueue((uint32_t) ptm->tm_mday, SIZEOF__BYTE);
-		}
-		else
+		}*/
+		//DEBUG2025: change this if to else when the timespec error is fixed
+		//remove the inside of the if statement too
+		if(!gps_data.set&TIME_SET)
 		{
 			Enqueue((uint32_t) 0xff, SIZEOF__BYTE);
 			Enqueue((uint32_t) 0xff, SIZEOF__BYTE);

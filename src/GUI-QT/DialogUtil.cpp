@@ -63,7 +63,9 @@
 # include "../sourcedecoders/neaacdec_dll.h"
 #endif
 #ifdef HAVE_LIBFDK_AAC
+//DEBUG2025
 # include "../sourcedecoders/fdk_aac_codec.h"
+//#include "src/sourcedecoders/fdk_aac_codec.h"
 #endif
 #ifdef USE_ALSA
 # include <alsa/version.h>
