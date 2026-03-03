@@ -763,8 +763,9 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
     if((gps.set&STATUS_SET)==0) {
         LEDGPS->SetLight(CMultColorLED::RL_RED);
     } else {
-
-        if(gps.status==0)
+        LEDGPS->SetLight(CMultColorLED::RL_GREEN);
+        //DEBUG2025 struct gps_data_t has no member named status -> might fix it later
+        /*if(gps.status==0)
             LEDGPS->SetLight(CMultColorLED::RL_YELLOW);
         else
             LEDGPS->SetLight(CMultColorLED::RL_GREEN);*/
@@ -799,11 +800,6 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
     else
         qStrTrack =  tr("  Track: ?");
     QString qStrTime;
-    if (gps.set&TIME_SET)
-    {
-        //qStrTime = "UTC: ?";
-        //QString qStrSat;
-        //struct tm * p_ts;
         //DEBUG2025
         //invalid cast from timespec_t (which is a struct) to time_t (which is a long int)
     if (gps.set&TIME_SET)
@@ -823,7 +819,7 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
                 .arg(p_ts->tm_min, 2, 10, fill)
                 .arg(p_ts->tm_sec,2, 10, fill);
     }
-    else
+
     //else
 	qStrTime = "UTC: ?";
     QString qStrSat;

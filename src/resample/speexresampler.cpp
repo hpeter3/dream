@@ -27,7 +27,7 @@ void SpeexResampler::Free()
 
 /* this function is only called when the input and output sample rates are different */
 void SpeexResampler::Resample(CVector<_REAL>& rInput, CVector<_REAL>& rOutput)
-{    
+{
     size_t iOutputBlockSize = vecfOutput.size();
     if ((rOutput.Size() != int(iOutputBlockSize)) || (GetFreeInputSize()<rInput.size())) {
         cerr << "SpeexResampler::Resample(): initialisation needed" << endl;
@@ -82,6 +82,7 @@ size_t SpeexResampler::GetFreeInputSize() const
 
 void SpeexResampler::Reset()
 {
+
     iInputBuffered = 0;
     if (resampler != nullptr)
     {
