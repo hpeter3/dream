@@ -1,9 +1,13 @@
 
 # dream-qt6
 
-An experimental Qt6 port of the Dream AM/DRM Receiver program for GNU/Linux. \
-Source code of the original project: https://sourceforge.net/p/drm/code/HEAD/tree/branches/dream-ollie-deployed/ \
-Currently this program is tested on Fedora 42/43, Debian 13 and Arch Linux. \
+An experimental Qt6 port of the Dream AM/DRM Receiver program for GNU/Linux. 
+
+Original starting point: https://sourceforge.net/p/drm/code/HEAD/tree/branches/dream-ollie-deployed/ \
+Starting point of this branch: https://github.com/Drm-tools/dream-legacy/tree/dream-ollie-deployed 
+
+Currently this program is tested on Fedora 43, Debian 13 and Arch Linux.
+
 Debian and RPM packages are in the works, I'll probably release a pre-alpha in the near future (transmitter part is broken without patched codecs)
 # Prerequisites (Qt6)
 ## Debian 13: 
