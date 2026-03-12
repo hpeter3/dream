@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-
+find_package(PkgConfig REQUIRED)
 
 option(USE_QT "Enable Qt support" ON)
 set(QT_MAJOR_VERSION 6 CACHE STRING "Prefer Qt major version (5 or 6). Used to select find_package behaviour")
@@ -111,7 +111,13 @@ if(UNIX)
                             HAVE_INTTYPES_H HAVE_SYS_STAT_H HAVE_SYS_TYPES_H HAVE_UNISTD_H
                             HAVE_LIBZ)
     list(APPEND CMAKE_REQUIRED_LIBRARIES dl rt)
-    list(APPEND EXTRA_LIBS "-lfftw3" "-lz")
+    	find_package(FFTW3 REQUIRED)
+	if(FFTW3_FOUND)
+    list(APPEND INCLUDE_DIRS ${FFTW3_INCLUDE_DIRS})
+    list(APPEND EXTRA_LIBS ${FFTW3_LIBRARIES})
+	endif()
+	find_package(ZLIB REQUIRED)
+    list(APPEND EXTRA_LIBS ZLIB::ZLIB)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "linux")
@@ -185,7 +191,7 @@ if(CONSOLE)
     if(UNIX AND NOT CROSS_COMPILE)
         list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.h)
         list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.cpp)
-        list(APPEND EXTRA_LIBS "-lpthread")
+		target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
         message(STATUS "Building with terminal user interface (console)")
     endif()
 endif()
@@ -208,7 +214,31 @@ endif()
 #Optional features (fdk-aac, opus, sndfile, speexdsp, gps, hamlib)
 if(ENABLE_FDK_AAC)
     add_compile_definitions(HAVE_LIBFDK_AAC HAVE_USAC)
-    list(APPEND EXTRA_LIBS -L/usr/lib64/fdk-aac -lfdk-aac)
+
+    pkg_check_modules(FDKAAC fdk-aac)
+
+    if(FDKAAC_FOUND)
+        list(APPEND INCLUDE_DIRS ${FDKAAC_INCLUDE_DIRS})
+
+        # Fedora hack: if pkg-config gives -lfdk-aac but the unversioned .so doesn't exist
+        # probably an issue with the RPMFusion provided fdk-aac package
+        set(FDKAAC_SO "/usr/lib64/libfdk-aac.so")
+        if(NOT EXISTS "${FDKAAC_SO}" AND EXISTS "/usr/lib64/libfdk-aac.so.2")
+            message(STATUS "fdk-aac workaround: linking against libfdk-aac.so.2")
+            list(APPEND EXTRA_LIBS /usr/lib64/libfdk-aac.so.2)
+        else()
+            list(APPEND EXTRA_LIBS ${FDKAAC_LIBRARIES})
+        endif()
+    else()
+        # fallback
+        if(EXISTS "/usr/lib64/libfdk-aac.so.2" AND EXISTS "/usr/include/fdk-aac")
+            list(APPEND INCLUDE_DIRS /usr/include/fdk-aac)
+            list(APPEND EXTRA_LIBS /usr/lib64/libfdk-aac.so.2)
+        else()
+            message(FATAL_ERROR "FDK-AAC requested but library not found")
+        endif()
+    endif()
+
     list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sourcedecoders/fdk_aac_codec.h)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sourcedecoders/fdk_aac_codec.cpp)
     message(STATUS "with fdk-aac")
@@ -216,32 +246,42 @@ endif()
 
 if(ENABLE_OPUS)
     add_compile_definitions(HAVE_LIBOPUS)
-    if(UNIX)
-        list(APPEND EXTRA_LIBS "-lopus")
+    pkg_check_modules(OPUS opus)
+    if(OPUS_FOUND)
+        list(APPEND INCLUDE_DIRS ${OPUS_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${OPUS_LIBRARIES})
     endif()
     message(STATUS "with opus")
 endif()
 
 if(ENABLE_SNDFILE)
     add_compile_definitions(HAVE_LIBSNDFILE)
-    if(UNIX)
-        list(APPEND EXTRA_LIBS sndfile)
-    endif()
+	pkg_check_modules(SNDFILE sndfile)
+
+	if(SNDFILE_FOUND)
+        list(APPEND INCLUDE_DIRS ${SNDFILE_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${SNDFILE_LIBRARIES})
+	endif()
     message(STATUS "with libsndfile")
 endif()
 
 if(ENABLE_SPEEXDSP)
-    add_compile_definitions(HAVE_SPEEX)
-    list(APPEND EXTRA_LIBS "-lspeexdsp")
-    message(STATUS "with speexdsp")
+    pkg_check_modules(SPEEXDSP speexdsp)
+    if(SPEEXDSP_FOUND)
+        list(APPEND INCLUDE_DIRS ${SPEEXDSP_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${SPEEXDSP_LIBRARIES})
+    endif()
 endif()
 
 
 if(ENABLE_HAMLIB)
     add_compile_definitions(HAVE_LIBHAMLIB)
-    if(UNIX)
-        list(APPEND EXTRA_LIBS "-lhamlib")
-    endif()
+	pkg_check_modules(HAMLIB hamlib)
+
+	if(HAMLIB_FOUND)
+        list(APPEND INCLUDE_DIRS ${HAMLIB_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${HAMLIB_LIBRARIES})
+	endif()
     # Remove in case already present
     list(REMOVE_ITEM HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.h)
     list(REMOVE_ITEM SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.cpp)
@@ -259,7 +299,17 @@ if(ENABLE_HAMLIB)
     message(STATUS "with hamlib")
 endif()
 
+if(ENABLE_GPS)
 
+	pkg_check_modules(GPS libgps)
+
+	if(GPS_FOUND)
+        list(APPEND INCLUDE_DIRS ${GPS_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${GPS_LIBRARIES})
+	endif()
+	add_compile_definitions(HAVE_LIBGPS)
+    message(STATUS "with gps")
+endif()
 
 if(ENABLE_ALSA)
     add_compile_definitions(USE_ALSA)
@@ -273,7 +323,13 @@ if(ENABLE_ALSA)
         ${CMAKE_SOURCE_DIR}/src/linux/alsaout.cpp
         ${CMAKE_SOURCE_DIR}/src/linux/alsacommon.cpp
     )
-    list(APPEND EXTRA_LIBS "-lasound")
+    
+	find_package(ALSA)
+	if(ALSA_FOUND)
+        list(APPEND INCLUDE_DIRS ${ALSA_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${ALSA_LIBRARIES})
+	endif()
+	
     message(STATUS "with alsa")
 endif()
 
@@ -287,7 +343,12 @@ if(ENABLE_PORTAUDIO)
         ${CMAKE_SOURCE_DIR}/src/sound/drm_portaudio.cpp
         ${CMAKE_SOURCE_DIR}/src/sound/pa_ringbuffer.c
     )
-    list(APPEND EXTRA_LIBS "-lportaudio")
+	pkg_check_modules(PORTAUDIO portaudio-2.0)
+
+	if(PORTAUDIO_FOUND)
+        list(APPEND INCLUDE_DIRS ${PORTAUDIO_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${PORTAUDIO_LIBRARIES})
+	endif()
     message(STATUS "with portaudio")
 endif()
 
@@ -295,24 +356,12 @@ if(ENABLE_PULSEAUDIO)
     add_compile_definitions(USE_PULSEAUDIO)
     list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_pulseaudio.h)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_pulseaudio.cpp)
-    if(UNIX)
-        # bugfix
-        # prefer pkg-config libpulse; fallback to -lpulse
-        find_package(PkgConfig QUIET)
-        if(PKG_CONFIG_FOUND)
-            pkg_check_modules(LIBPULSE libpulse QUIET)
-            if(LIBPULSE_FOUND)
-                list(APPEND EXTRA_LIBS ${LIBPULSE_LIBRARIES})
-                list(APPEND INCLUDE_DIRS ${LIBPULSE_INCLUDE_DIRS})
-            else()
-                list(APPEND EXTRA_LIBS "-lpulse")
-            endif()
-        else()
-            list(APPEND EXTRA_LIBS "-lpulse")
-        endif()
-    else()
-        list(APPEND EXTRA_LIBS "-lpulse")
-    endif()
+	pkg_check_modules(PULSE libpulse)
+
+	if(PULSE_FOUND)
+        list(APPEND INCLUDE_DIRS ${PULSE_INCLUDE_DIRS})
+        list(APPEND EXTRA_LIBS ${PULSE_LIBRARIES})
+	endif()
     message(STATUS "with pulseaudio")
 endif()
 
@@ -320,20 +369,11 @@ if(ENABLE_SOAPYSDR)
     add_compile_definitions(USE_SOAPYSDR)
     list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_soapySDR.h)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_soapySDR.cpp)
+	find_package(SoapySDR)
 
-    find_package(PkgConfig QUIET)
-    if(PKG_CONFIG_FOUND)
-        pkg_check_modules(SOAPYSDR SoapySDR QUIET)
-        if(SOAPYSDR_FOUND)
-            list(APPEND EXTRA_LIBS ${SOAPYSDR_LIBRARIES})
-            list(APPEND INCLUDE_DIRS ${SOAPYSDR_INCLUDE_DIRS})
-        else()
-            list(APPEND EXTRA_LIBS "-lSoapySDR")
-        endif()
-    else()
-        list(APPEND EXTRA_LIBS "-lSoapySDR")
-    endif()
-
+	if(SoapySDR_FOUND)
+        list(APPEND EXTRA_LIBS SoapySDR::SoapySDR)
+	endif()
     message(STATUS "with SoapySDR")
 endif()
 
@@ -344,22 +384,17 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(ALL_SOURCES ${SOURCE_FILES})
 set(ALL_HEADERS ${HEADER_FILES})
 
-
+####################################################################################
 add_executable(${PROJECT_NAME} ${ALL_SOURCES} ${RESOURCES})
 # Make sure the compiler can find generated ui_*.h files
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/dream_autogen/include
 )
+####################################################################################
 include(cmake/hardening.cmake)
-# Bugfix: GPS and Qwt must be after add_executable
-if(ENABLE_GPS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBGPS)
-    if(UNIX)
-        target_link_libraries(${PROJECT_NAME} PRIVATE gps)
-    endif()
-    message(STATUS "with gps")
-endif()
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${EXTRA_LIBS})
 
 if(ENABLE_QWT)
     find_path(QWT_INCLUDE_DIR qwt_dial.h
@@ -376,30 +411,12 @@ if(ENABLE_QWT)
     endif()
 endif()
 
-foreach(LK IN LISTS EXTRA_LIBS)
-
-    #if(LK MATCHES "^-l" OR LK MATCHES "^-L" OR LK MATCHES "^-Wl,")
-    #bugfix
-    #not the best way to handle this, might rewrite this entirely with two or three lists
-    if(LK MATCHES "^-Wl,")
-        target_link_options(${PROJECT_NAME} PRIVATE "${LK}")
-    else()
-        target_link_libraries(${PROJECT_NAME} PRIVATE ${LK})
-    endif()
-endforeach()
-if(UNIX)
-    target_link_libraries(${PROJECT_NAME} PRIVATE dl rt)
-endif()
-
 if(UNIX AND NOT CROSS_COMPILE)
     if(DEFINED ENABLE_LIBPCAP)
         target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBPCAP)
         find_library(PCAP_LIB pcap)
         if(PCAP_LIB)
             target_link_libraries(${PROJECT_NAME} PRIVATE ${PCAP_LIB})
-        else()
-            # fallback to -lpcap
-            target_link_options(${PROJECT_NAME} PRIVATE "-lpcap")
         endif()
     endif()
 endif()
