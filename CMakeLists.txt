@@ -27,6 +27,7 @@ option(ENABLE_PORTAUDIO "Enable PortAudio support" OFF)
 option(ENABLE_PULSEAUDIO "Enable PulseAudio support" OFF)
 option(ENABLE_SOAPYSDR "Enable SoapySDR support" OFF)
 option(ENABLE_JACK "Enable JACK support" OFF)
+option(ENABLE_HARDENING "Enable compiler/linker hardening flags" ON)
 if(NOT USE_QT)
     set(CONSOLE ON)
 endif()
@@ -350,29 +351,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/dream_autogen/include
 )
-# Hardening
-target_compile_options(${PROJECT_NAME} PRIVATE
-    -fstack-protector-strong
-    -fstack-clash-protection
-    -D_FORTIFY_SOURCE=2
-    -D_GLIBCXX_ASSERTIONS
-    -fstrict-flex-arrays=3
-    -fPIE
-    -pthread
-)
-
-target_link_options(${PROJECT_NAME} PRIVATE
-    -pie
-    -Wl,-z,relro
-    -Wl,-z,now
-    -Wl,-z,nodlopen
-    -Wl,-z,noexecstack
-    -Wl,--as-needed
-    -Wl,--no-copy-dt-needed-entries
-    -pthread
-)
-
-
+include(cmake/hardening.cmake)
 # Bugfix: GPS and Qwt must be after add_executable
 if(ENABLE_GPS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_LIBGPS)
@@ -490,6 +469,10 @@ elseif(QTCONSOLE)
     message(STATUS "UI: qtconsole mode")
 else()
     message(STATUS "UI: GUI mode")
+endif()
+
+if(ENABLE_HARDENING)
+    message(STATUS "Hardening enabled")
 endif()
 
 if(NOT ENABLE_PULSEAUDIO AND NOT ENABLE_PORTAUDIO AND NOT ENABLE_ALSA AND NOT ENABLE_SOAPYSDR)
