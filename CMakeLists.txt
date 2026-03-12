@@ -1,7 +1,4 @@
 cmake_minimum_required(VERSION 3.16)
-
-# LANGUAGES "C" is a bugfix for Journaline linking issue: dabdgdec_impl.c
-#dabdgdec_impl.c is VERY weird
 project(dream LANGUAGES C CXX)
 set(PROJECT_NAME dream)
 set(CMAKE_CXX_STANDARD 20)
@@ -29,280 +26,82 @@ option(ENABLE_ALSA "Enable ALSA support" OFF)
 option(ENABLE_PORTAUDIO "Enable PortAudio support" OFF)
 option(ENABLE_PULSEAUDIO "Enable PulseAudio support" OFF)
 option(ENABLE_SOAPYSDR "Enable SoapySDR support" OFF)
+option(ENABLE_JACK "Enable JACK support" OFF)
 if(NOT USE_QT)
     set(CONSOLE ON)
 endif()
 
 
 list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/include")
-list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/GUI-QT" "${CMAKE_SOURCE_DIR}/src/util-QT" "${CMAKE_SOURCE_DIR}/src/main-Qt")
+list(APPEND INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src")
 
 # not ideal, but works
-add_compile_definitions(EXECUTABLE_NAME="${PROJECT_NAME}")
+add_compile_definitions(EXECUTABLE_NAME=${PROJECT_NAME})
 add_compile_definitions(QT_DISABLE_DEPRECATED_UP_TO=0x060700)
 add_compile_definitions(WARN_ON)
 
-set(HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/src/AMDemodulation.h
-    ${CMAKE_SOURCE_DIR}/src/AMSSDemodulation.h
-    ${CMAKE_SOURCE_DIR}/src/chanest/ChanEstTime.h
-    ${CMAKE_SOURCE_DIR}/src/chanest/ChannelEstimation.h
-    ${CMAKE_SOURCE_DIR}/src/chanest/IdealChannelEstimation.h
-    ${CMAKE_SOURCE_DIR}/src/chanest/TimeLinear.h
-    ${CMAKE_SOURCE_DIR}/src/chanest/TimeWiener.h
-    ${CMAKE_SOURCE_DIR}/src/creceivedata.h
-    ${CMAKE_SOURCE_DIR}/src/ctransmitdata.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/DABMOT.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataDecoder.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataEncoder.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/epgutil.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/Experiment.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/cpplog.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/crc_8_16.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdatagroupdecoder.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdgdec_impl.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/Journaline.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/log.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newsobject.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newssvcdec.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newssvcdec_impl.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/NML.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/Splitter.h
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/MOTSlideShow.h
-    ${CMAKE_SOURCE_DIR}/src/DataIO.h
-    ${CMAKE_SOURCE_DIR}/src/drmchannel/ChannelSimulation.h
-    ${CMAKE_SOURCE_DIR}/src/DrmReceiver.h
-    ${CMAKE_SOURCE_DIR}/src/DrmSimulation.h
-    ${CMAKE_SOURCE_DIR}/src/DrmTransceiver.h
-    ${CMAKE_SOURCE_DIR}/src/DrmTransmitter.h
-    ${CMAKE_SOURCE_DIR}/src/FAC/FAC.h
-    ${CMAKE_SOURCE_DIR}/src/GlobalDefinitions.h
-    ${CMAKE_SOURCE_DIR}/src/InputResample.h
-    ${CMAKE_SOURCE_DIR}/src/interleaver/BlockInterleaver.h
-    ${CMAKE_SOURCE_DIR}/src/interleaver/SymbolInterleaver.h
-    ${CMAKE_SOURCE_DIR}/src/IQInputFilter.h
-    ${CMAKE_SOURCE_DIR}/src/matlib/Matlib.h
-    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibSigProToolbox.h
-    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibStdToolbox.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/AFPacketGenerator.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIDecode.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIDefinitions.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIInBuffer.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIRSCI.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItemDecoders.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItems.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketInOut.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSinkFile.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocket.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSourceFile.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/Pft.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/RCITagItems.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/RSCITagItemDecoders.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/RSISubscriber.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagItemDecoder.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoder.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderMDI.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderRSCIControl.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketGenerator.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/BitInterleaver.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/ChannelCode.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/ConvEncoder.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/EnergyDispersal.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/Metric.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/MLC.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/QAMMapping.h
-    ${CMAKE_SOURCE_DIR}/src/mlc/ViterbiDecoder.h
-    ${CMAKE_SOURCE_DIR}/src/MSCMultiplexer.h
-    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/CellMappingTable.h
-    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/OFDMCellMapping.h
-    ${CMAKE_SOURCE_DIR}/src/OFDM.h
-    ${CMAKE_SOURCE_DIR}/src/Parameter.h
-    ${CMAKE_SOURCE_DIR}/src/PlotManager.h
-    ${CMAKE_SOURCE_DIR}/src/ReceptLog.h
-    ${CMAKE_SOURCE_DIR}/src/resample/ResampleFilter.h
-    ${CMAKE_SOURCE_DIR}/src/resample/Resample.h
-    ${CMAKE_SOURCE_DIR}/src/Scheduler.h
-    ${CMAKE_SOURCE_DIR}/src/SDC/SDC.h
-    ${CMAKE_SOURCE_DIR}/src/SDC/audioparam.h
-    ${CMAKE_SOURCE_DIR}/src/ServiceInformation.h
-    ${CMAKE_SOURCE_DIR}/src/sound/audiofilein.h
-    ${CMAKE_SOURCE_DIR}/src/sound/selectioninterface.h
-    ${CMAKE_SOURCE_DIR}/src/sound/soundinterface.h
-    ${CMAKE_SOURCE_DIR}/src/sound/soundnull.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/aac_codec.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioCodec.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceDecoder.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceEncoder.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/null_codec.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/opus_codec.h
-    ${CMAKE_SOURCE_DIR}/src/spectrumanalyser.h
-    ${CMAKE_SOURCE_DIR}/src/sync/FreqSyncAcq.h
-    ${CMAKE_SOURCE_DIR}/src/sync/SyncUsingPil.h
-    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncFilter.h
-    ${CMAKE_SOURCE_DIR}/src/sync/TimeSync.h
-    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncTrack.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableAMSS.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableCarMap.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableDRMGlobal.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableFAC.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableMLC.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableQAMMapping.h
-    ${CMAKE_SOURCE_DIR}/src/tables/TableStations.h
-    ${CMAKE_SOURCE_DIR}/src/TextMessage.h
-    ${CMAKE_SOURCE_DIR}/src/UpsampleFilter.h
-    ${CMAKE_SOURCE_DIR}/src/util/AudioFile.h
-    ${CMAKE_SOURCE_DIR}/src/util/Buffer.h
-    ${CMAKE_SOURCE_DIR}/src/util/CRC.h
-    ${CMAKE_SOURCE_DIR}/src/util/FileTyper.h
-    ${CMAKE_SOURCE_DIR}/src/util/LibraryLoader.h
-    ${CMAKE_SOURCE_DIR}/src/util/LogPrint.h
-    ${CMAKE_SOURCE_DIR}/src/util/Modul.h
-    ${CMAKE_SOURCE_DIR}/src/util/Pacer.h
-    ${CMAKE_SOURCE_DIR}/src/util/Reassemble.h
-    ${CMAKE_SOURCE_DIR}/src/util/Settings.h
-    ${CMAKE_SOURCE_DIR}/src/util/Utilities.h
-    ${CMAKE_SOURCE_DIR}/src/util/Vector.h
-    ${CMAKE_SOURCE_DIR}/src/Version.h
-    ${CMAKE_SOURCE_DIR}/src/MSC/logicalframe.h
-    ${CMAKE_SOURCE_DIR}/src/MSC/audiosuperframe.h
-    ${CMAKE_SOURCE_DIR}/src/MSC/aacsuperframe.h
-    ${CMAKE_SOURCE_DIR}/src/MSC/xheaacsuperframe.h
-    ${CMAKE_SOURCE_DIR}/src/MSC/frameborderdescription.h
-    ${CMAKE_SOURCE_DIR}/src/resample/speexresampler.h
-    ${CMAKE_SOURCE_DIR}/src/resample/cspectrumresample.h
-    ${CMAKE_SOURCE_DIR}/src/resample/caudioresample.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/reverb.h
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/caudioreverb.h
-    ${CMAKE_SOURCE_DIR}/src/tuner.h
-    ${CMAKE_SOURCE_DIR}/src/sound/soundinterfacefactory.h
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocketHTTP.h
-)
-# Bugfix
-#list(APPEND SOURCE_FILES
-#    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdgdec_impl.c
-#)
+# GLOB_RECURSE includes EVERYTHING by default.
+# We have to remove every single ENABLE_ and USE_QT include first.
+# needed for ENABLE_ compatibility
 
-set(SOURCE_FILES
-    ${CMAKE_SOURCE_DIR}/src/AMDemodulation.cpp
-    ${CMAKE_SOURCE_DIR}/src/AMSSDemodulation.cpp
-    ${CMAKE_SOURCE_DIR}/src/chanest/ChanEstTime.cpp
-    ${CMAKE_SOURCE_DIR}/src/chanest/ChannelEstimation.cpp
-    ${CMAKE_SOURCE_DIR}/src/chanest/IdealChannelEstimation.cpp
-    ${CMAKE_SOURCE_DIR}/src/chanest/TimeLinear.cpp
-    ${CMAKE_SOURCE_DIR}/src/chanest/TimeWiener.cpp
-    ${CMAKE_SOURCE_DIR}/src/creceivedata.cpp
-    ${CMAKE_SOURCE_DIR}/src/ctransmitdata.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/DABMOT.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataDecoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/DataEncoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/epgutil.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/Experiment.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/Journaline.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/crc_8_16.c
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/dabdgdec_impl.c
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/log.c
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newsobject.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/newssvcdec_impl.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/NML.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/journaline/Splitter.cpp
-    ${CMAKE_SOURCE_DIR}/src/datadecoding/MOTSlideShow.cpp
-    ${CMAKE_SOURCE_DIR}/src/DataIO.cpp
-    ${CMAKE_SOURCE_DIR}/src/drmchannel/ChannelSimulation.cpp
-    ${CMAKE_SOURCE_DIR}/src/DrmReceiver.cpp
-    ${CMAKE_SOURCE_DIR}/src/DrmSimulation.cpp
-    ${CMAKE_SOURCE_DIR}/src/DrmTransmitter.cpp
-    ${CMAKE_SOURCE_DIR}/src/FAC/FAC.cpp
-    ${CMAKE_SOURCE_DIR}/src/InputResample.cpp
-    ${CMAKE_SOURCE_DIR}/src/interleaver/BlockInterleaver.cpp
-    ${CMAKE_SOURCE_DIR}/src/interleaver/SymbolInterleaver.cpp
-    ${CMAKE_SOURCE_DIR}/src/IQInputFilter.cpp
-    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibSigProToolbox.cpp
-    ${CMAKE_SOURCE_DIR}/src/matlib/MatlibStdToolbox.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/AFPacketGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIDecode.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIInBuffer.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDIRSCI.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItemDecoders.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/MDITagItems.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSinkFile.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocket.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSourceFile.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/Pft.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/RCITagItems.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/RSCITagItemDecoders.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/RSISubscriber.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderMDI.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketDecoderRSCIControl.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/TagPacketGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/BitInterleaver.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/ChannelCode.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/ConvEncoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/EnergyDispersal.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/Metric.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/MLC.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/QAMMapping.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/TrellisUpdateMMX.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/TrellisUpdateSSE2.cpp
-    ${CMAKE_SOURCE_DIR}/src/mlc/ViterbiDecoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/MSCMultiplexer.cpp
-    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/CellMappingTable.cpp
-    ${CMAKE_SOURCE_DIR}/src/ofdmcellmapping/OFDMCellMapping.cpp
-    ${CMAKE_SOURCE_DIR}/src/OFDM.cpp
-    ${CMAKE_SOURCE_DIR}/src/Parameter.cpp
-    ${CMAKE_SOURCE_DIR}/src/PlotManager.cpp
-    ${CMAKE_SOURCE_DIR}/src/ReceptLog.cpp
-    ${CMAKE_SOURCE_DIR}/src/resample/Resample.cpp
-    ${CMAKE_SOURCE_DIR}/src/resample/ResampleFilter.cpp
-    ${CMAKE_SOURCE_DIR}/src/Scheduler.cpp
-    ${CMAKE_SOURCE_DIR}/src/SDC/SDCReceive.cpp
-    ${CMAKE_SOURCE_DIR}/src/SDC/SDCTransmit.cpp
-    ${CMAKE_SOURCE_DIR}/src/SDC/audioparam.cpp
-    ${CMAKE_SOURCE_DIR}/src/ServiceInformation.cpp
-    ${CMAKE_SOURCE_DIR}/src/SimulationParameters.cpp
-    ${CMAKE_SOURCE_DIR}/src/sound/audiofilein.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/aac_codec.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioCodec.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceDecoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/AudioSourceEncoder.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/null_codec.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/opus_codec.cpp
-    ${CMAKE_SOURCE_DIR}/src/spectrumanalyser.cpp
-    ${CMAKE_SOURCE_DIR}/src/sync/FreqSyncAcq.cpp
-    ${CMAKE_SOURCE_DIR}/src/sync/SyncUsingPil.cpp
-    ${CMAKE_SOURCE_DIR}/src/sync/TimeSync.cpp
-    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncFilter.cpp
-    ${CMAKE_SOURCE_DIR}/src/sync/TimeSyncTrack.cpp
-    ${CMAKE_SOURCE_DIR}/src/tables/TableCarMap.cpp
-    ${CMAKE_SOURCE_DIR}/src/tables/TableFAC.cpp
-    ${CMAKE_SOURCE_DIR}/src/tables/TableStations.cpp
-    ${CMAKE_SOURCE_DIR}/src/TextMessage.cpp
-    ${CMAKE_SOURCE_DIR}/src/util/CRC.cpp
-    ${CMAKE_SOURCE_DIR}/src/util/FileTyper.cpp
-    ${CMAKE_SOURCE_DIR}/src/util/LogPrint.cpp
-    ${CMAKE_SOURCE_DIR}/src/util/Reassemble.cpp
-    ${CMAKE_SOURCE_DIR}/src/util/Settings.cpp
-    ${CMAKE_SOURCE_DIR}/src/util/Utilities.cpp
-    ${CMAKE_SOURCE_DIR}/src/Version.cpp
-    ${CMAKE_SOURCE_DIR}/src/sound/soundnull.cpp
-    ${CMAKE_SOURCE_DIR}/src/DrmTransceiver.cpp
-    ${CMAKE_SOURCE_DIR}/src/sound/soundinterface.cpp
-    ${CMAKE_SOURCE_DIR}/src/sound/selectioninterface.cpp
-    ${CMAKE_SOURCE_DIR}/src/MSC/logicalframe.cpp
-    ${CMAKE_SOURCE_DIR}/src/MSC/audiosuperframe.cpp
-    ${CMAKE_SOURCE_DIR}/src/MSC/aacsuperframe.cpp
-    ${CMAKE_SOURCE_DIR}/src/MSC/xheaacsuperframe.cpp
-    ${CMAKE_SOURCE_DIR}/src/MSC/frameborderdescription.cpp
-    ${CMAKE_SOURCE_DIR}/src/resample/speexresampler.cpp
-    ${CMAKE_SOURCE_DIR}/src/resample/cspectrumresample.cpp
-    ${CMAKE_SOURCE_DIR}/src/resample/caudioresample.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/reverb.cpp
-    ${CMAKE_SOURCE_DIR}/src/sourcedecoders/caudioreverb.cpp
-    ${CMAKE_SOURCE_DIR}/src/tuner.cpp
-    ${CMAKE_SOURCE_DIR}/src/sound/soundinterfacefactory.cpp
-    ${CMAKE_SOURCE_DIR}/src/MDI/PacketSocketHTTP.cpp
+# Exclude the optional modules by default:
+set(OPTIONAL_MODULES
+    jack
+    shmsoundin
+    drm_portaudio
+    drm_pulseaudio
+    drm_soapySDR
+    fdk_aac_codec
+    alsain
+    alsaout
+    alsacommon
+    pa_ringbuffer
+    Pacer
+    ConsoleIO
 )
 
+function(filter_optional MODULE_LIST)
+    foreach(MODULE IN LISTS MODULE_LIST)
+        if(MODULE STREQUAL "jack" OR MODULE STREQUAL "shmsoundin")
+            if(ENABLE_JACK)
+                continue()
+            endif()
+        endif()
+        list(FILTER SOURCE_FILES  EXCLUDE REGEX ".*/${MODULE}\\.cpp$")
+        list(FILTER HEADER_FILES  EXCLUDE REGEX ".*/${MODULE}\\.h$")
+        list(FILTER SOURCE_FILES  EXCLUDE REGEX ".*/${MODULE}\\.c$")
+    endforeach()
+    # push changes to parent scope
+    set(SOURCE_FILES ${SOURCE_FILES} PARENT_SCOPE)
+    set(HEADER_FILES ${HEADER_FILES} PARENT_SCOPE)
+endfunction()
+
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.h)
+file(GLOB_RECURSE SOURCE_FILES
+    CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/*.c
+)
+
+
+
+# linking issue when multiple main.cpp files are included
+list(REMOVE_ITEM SOURCE_FILES
+    ${CMAKE_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/main-Qt/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp
+)
+filter_optional("${OPTIONAL_MODULES}")
+
+# Remove all GUI files, they should only be added if USE_QT is ON
+function(filter_gui_files)
+    foreach(DIR IN ITEMS "GUI-QT" "main-Qt" "util-QT")
+        list(FILTER SOURCE_FILES EXCLUDE REGEX ".*/${DIR}/.*")
+        list(FILTER HEADER_FILES EXCLUDE REGEX ".*/${DIR}/.*")
+    endforeach()
+endfunction()
+
+filter_gui_files()
 
 if(UNIX)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/Pacer.cpp)
@@ -319,8 +118,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "linux")
 endif()
 
 
-
-
 # If Qt GUI support is enabled, add GUI-specific sources & forms
 set(FORMS "")
 set(GUI_HEADERS "")
@@ -329,95 +126,55 @@ set(RESOURCES "")
 if(USE_QT)
 
     list(APPEND RESOURCES src/GUI-QT/res/icons.qrc)
-    list(APPEND INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/src/GUI-QT)
-    list(APPEND FORMS
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AboutDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AMMainWindow.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AMSSDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AACCodecParams.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/OpusCodecParams.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DRMMainWindow.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EPGDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/FMMainWindow.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/GeneralSettingsDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/JLViewer.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/LiveScheduleWindow.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultSettingsDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SlideShowViewer.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/StationsDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/systemevalDlgbase.ui
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/TransmDlgbase.ui
+    list(APPEND INCLUDE_DIRS
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT"
+        "${CMAKE_SOURCE_DIR}/src/util-QT"
+        "${CMAKE_SOURCE_DIR}/src/main-Qt"
     )
-    list(APPEND GUI_HEADERS
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AnalogDemDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/CWindow.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DialogUtil.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DRMPlot.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EPGDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EvaluationDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fdrmdialog.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fmdialog.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/GeneralSettingsDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/jlbrowser.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/JLViewer.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/LiveScheduleDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultColorLED.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultSettingsDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Schedule.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SlideShowViewer.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SoundCardSelMenu.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/StationsDlg.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/OpusCodecParams.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AACCodecParams.h
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/TransmDlg.h
+    # BWS and Rig is handled separately.
+    file(GLOB FORMS_GLOB "${CMAKE_SOURCE_DIR}/src/GUI-QT/*.ui")
+    list(REMOVE_ITEM FORMS_GLOB
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.ui"
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.ui"
     )
-    list(APPEND GUI_SOURCES
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AnalogDemDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/CWindow.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DialogUtil.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/DRMPlot.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EPGDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/EvaluationDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fdrmdialog.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/fmdialog.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/GeneralSettingsDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/jlbrowser.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/JLViewer.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/LiveScheduleDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultColorLED.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/MultSettingsDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Schedule.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SlideShowViewer.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/SoundCardSelMenu.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/StationsDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/OpusCodecParams.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/AACCodecParams.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/TransmDlg.cpp
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp
+    list(APPEND FORMS ${FORMS_GLOB})
+
+
+    file(GLOB GUI_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/GUI-QT/*.h")
+    list(REMOVE_ITEM GUI_HEADERS_GLOB
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.h"
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.h"
     )
+    list(APPEND GUI_HEADERS ${GUI_HEADERS_GLOB})
+    
+    file(GLOB GUI_SOURCES_GLOB
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/*.cpp"
+    )
+    list(REMOVE_ITEM GUI_SOURCES_GLOB
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.cpp"
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.cpp"
+        "${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp"
+    )
+    list(APPEND GUI_SOURCES ${GUI_SOURCES_GLOB})
+    
+    file(GLOB UTIL_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/*.h")
+    list(REMOVE_ITEM UTIL_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/Rig.h")
+    list(APPEND GUI_HEADERS ${UTIL_HEADERS_GLOB})
+    
+    file(GLOB UTIL_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/*.cpp")
+    list(REMOVE_ITEM UTIL_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/Rig.cpp")
+    list(APPEND GUI_SOURCES ${UTIL_SOURCES_GLOB})
+    
+    file(GLOB MAINQT_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/main-Qt/*.h")
+    list(APPEND GUI_HEADERS ${MAINQT_HEADERS_GLOB})
+    
+    file(GLOB MAINQT_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/main-Qt/*.cpp")
+    list(REMOVE_ITEM MAINQT_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/main-Qt/main.cpp")
+    list(APPEND GUI_SOURCES ${MAINQT_SOURCES_GLOB})
+    
+    
     list(APPEND SOURCE_FILES ${GUI_SOURCES})
     list(APPEND HEADER_FILES ${GUI_HEADERS})
-endif()
-
-if(USE_QT)
-    list(APPEND HEADER_FILES
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Logging.h
-        ${CMAKE_SOURCE_DIR}/src/util-QT/epgdec.h
-        ${CMAKE_SOURCE_DIR}/src/util-QT/EPG.h
-        ${CMAKE_SOURCE_DIR}/src/util-QT/Util.h
-        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctrx.h
-        ${CMAKE_SOURCE_DIR}/src/main-Qt/crx.h
-        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctx.h
-    )
-    list(APPEND SOURCE_FILES
-        ${CMAKE_SOURCE_DIR}/src/GUI-QT/Logging.cpp
-        ${CMAKE_SOURCE_DIR}/src/util-QT/EPG.cpp
-        ${CMAKE_SOURCE_DIR}/src/util-QT/epgdec.cpp
-        ${CMAKE_SOURCE_DIR}/src/util-QT/Util.cpp
-        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctrx.cpp
-        ${CMAKE_SOURCE_DIR}/src/main-Qt/crx.cpp
-        ${CMAKE_SOURCE_DIR}/src/main-Qt/ctx.cpp
-    )
 endif()
 
 if(CONSOLE)
@@ -441,6 +198,11 @@ if(QTCONSOLE)
         list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.cpp)
         message(STATUS "Building Qt console with terminal user interface")
     endif()
+endif()
+
+# GUI main (default)
+if(NOT CONSOLE AND NOT QTCONSOLE)
+    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp)
 endif()
 #Optional features (fdk-aac, opus, sndfile, speexdsp, gps, hamlib)
 if(ENABLE_FDK_AAC)
@@ -479,6 +241,9 @@ if(ENABLE_HAMLIB)
     if(UNIX)
         list(APPEND EXTRA_LIBS "-lhamlib")
     endif()
+    # Remove in case already present
+    list(REMOVE_ITEM HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.h)
+    list(REMOVE_ITEM SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.cpp)
     list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.h)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.cpp)
     if(USE_QT)
@@ -590,7 +355,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -fstack-protector-strong
     -fstack-clash-protection
     -D_FORTIFY_SOURCE=2
-    -D_GLIBCXX_ASSERTIONS #libsdtc++, might not work on Clang / MSVC, TODO!
+    -D_GLIBCXX_ASSERTIONS
     -fstrict-flex-arrays=3
     -fPIE
     -pthread
@@ -602,8 +367,8 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -Wl,-z,now
     -Wl,-z,nodlopen
     -Wl,-z,noexecstack
-    -Wl,--as-needed # might break stuff
-    -Wl,--no-copy-dt-needed-entries # might break stuff
+    -Wl,--as-needed
+    -Wl,--no-copy-dt-needed-entries
     -pthread
 )
 
@@ -696,12 +461,11 @@ if(USE_QT)
 	    FILES ${RESOURCES}
 	)
 # bugfix for linking issue
-	qt6_wrap_ui(QT_FORMS ${FORMS})
 	target_sources(${PROJECT_NAME} PRIVATE ${QT_FORMS})
         endif()
     else()
         # Try Qt5
-        message(STATUS "Qt6 not found!!!")
+        message(FATAL_ERROR "Qt6 not found!!!")
     endif()
 endif()
 
@@ -736,6 +500,9 @@ if(NOT ENABLE_PULSEAUDIO AND NOT ENABLE_PORTAUDIO AND NOT ENABLE_ALSA AND NOT EN
 endif()
 if(ENABLE_SOAPYSDR)
      message(WARNING "ENABLE_SOAPYSDR detected, expect runtime bugs.")
+endif()
+if(ENABLE_JACK)
+     message(WARNING "ENABLE_JACK detected, JACK isn't supported currently, it probably won't run / compile at all.")
 endif()
 
 set(DREAM_INCLUDE_DIRS ${INCLUDE_DIRS} CACHE INTERNAL "dream include dirs")

@@ -35,6 +35,8 @@
 #include <QTcpSocket>
 #include <iostream>
 #include <sstream>
+#include <vector>
+#include <string>
 
 #include <errno.h>
 #ifndef _WIN32
@@ -83,24 +85,24 @@ CPacketSocketQT::ResetPacketSink(void)
 
 // Send packet to the socket
 void
-CPacketSocketQT::SendPacket(const vector < _BYTE > &vecbydata, uint32_t addr, uint16_t port)
+CPacketSocketQT::SendPacket(const std::vector < _BYTE > &vecbydata, uint32_t addr, uint16_t port)
 {
     /*int bytes_written;*/
     (void)addr; (void)port;
     if(udpSocket != NULL)
         /*bytes_written =*/ udpSocket->writeDatagram((char*)&vecbydata[0], vecbydata.size(), HostAddrOut, iHostPortOut);
     else if(tcpSocket != NULL)
-       /*bytes_written =*/ tcpSocket->write((char*)&vecbydata[0], vecbydata.size());
+        /*bytes_written =*/ tcpSocket->write((char*)&vecbydata[0], vecbydata.size());
 }
 
 QStringList
-CPacketSocketQT::parseDest(const string & strNewAddr)
+CPacketSocketQT::parseDest(const std::string & strNewAddr)
 {
-    return QString(strNewAddr.c_str()).split(":", QString::KeepEmptyParts);
+    return QString(strNewAddr.c_str()).split(":", Qt::KeepEmptyParts);
 }
 
 bool
-CPacketSocketQT::SetDestination(const string & strNewAddr)
+CPacketSocketQT::SetDestination(const std::string & strNewAddr)
 {
     /* syntax
        1:  <port>                send to port on localhost
@@ -150,13 +152,13 @@ CPacketSocketQT::SetDestination(const string & strNewAddr)
         if(mc_if != 0)
         {
             if(setsockopt(s, IPPROTO_IP, IP_MULTICAST_IF,
-                          (char *) &mc_if, sizeof(mc_if)) == SOCKET_ERROR)
+                           (char *) &mc_if, sizeof(mc_if)) == SOCKET_ERROR)
                 bAddressOK = false;
         }
 # else
         udpSocket->setSocketOption(QAbstractSocket::MulticastTtlOption, ttl);
         if(AddrInterface != QHostAddress(QHostAddress::Any))
-             udpSocket->setMulticastInterface(GetInterface(AddrInterface));
+            udpSocket->setMulticastInterface(GetInterface(AddrInterface));
 # endif
     }
     else
@@ -170,9 +172,9 @@ CPacketSocketQT::SetDestination(const string & strNewAddr)
 }
 
 bool
-CPacketSocketQT::GetDestination(string & str)
+CPacketSocketQT::GetDestination(std::string & str)
 {
-    stringstream s;
+    std::stringstream s;
     s << HostAddrOut.toString().toLatin1().constData() << ":" << iHostPortOut;
     str = s.str();
     return true;
@@ -180,7 +182,7 @@ CPacketSocketQT::GetDestination(string & str)
 
 
 bool
-CPacketSocketQT::SetOrigin(const string & strNewAddr)
+CPacketSocketQT::SetOrigin(const std::string & strNewAddr)
 {
     /* syntax (unwanted fields can be empty, e.g. <source ip>::<group ip>:<port>
        1:  <port>
@@ -320,7 +322,7 @@ CPacketSocketQT::poll()
 void
 CPacketSocketQT::pollStream()
 {
-    vector < _BYTE > vecbydata(MAX_SIZE_BYTES_NETW_BUF);
+    std::vector < _BYTE > vecbydata(MAX_SIZE_BYTES_NETW_BUF);
     /* Read block from network interface */
     int iNumBytesRead = tcpSocket->read((char *) &vecbydata[0], MAX_SIZE_BYTES_NETW_BUF);
     if(iNumBytesRead > 0)
@@ -341,7 +343,7 @@ CPacketSocketQT::pollStream()
 void
 CPacketSocketQT::pollDatagram()
 {
-    vector < _BYTE > vecbydata(MAX_SIZE_BYTES_NETW_BUF);
+    std::vector < _BYTE > vecbydata(MAX_SIZE_BYTES_NETW_BUF);
     while (udpSocket->hasPendingDatagrams()) {
         vecbydata.resize(udpSocket->pendingDatagramSize());
         QHostAddress sender;

@@ -31,7 +31,8 @@
 \******************************************************************************/
 
 #include "PacketSocketNull.h"
-
+#include <vector>
+#include <string>
 // Set the sink which will receive the packets
 void CPacketSocketNull::SetPacketSink(CPacketSink*)
 {
@@ -43,7 +44,7 @@ void CPacketSocketNull::ResetPacketSink(void)
 }
 
 // Send packet to the socket
-void CPacketSocketNull::SendPacket(const vector<_BYTE>&, uint32_t, uint16_t)
+void CPacketSocketNull::SendPacket(const std::vector<_BYTE>&, uint32_t, uint16_t)
 {
 }
 
@@ -51,17 +52,17 @@ void CPacketSocketNull::poll()
 {
 }
 
-bool CPacketSocketNull::SetOrigin(const string&)
+bool CPacketSocketNull::SetOrigin(const std::string&)
 {
-	return false;
+    return false;
 }
 
-bool CPacketSocketNull::SetDestination(const string&)
+bool CPacketSocketNull::SetDestination(const std::string&)
 {
-	return false;
+    return false;
 }
 
-bool CPacketSocketNull::GetDestination(string&)
+bool CPacketSocketNull::GetDestination(std::string&)
 {
-	return false;
+    return false;
 }
