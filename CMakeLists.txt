@@ -45,7 +45,7 @@ add_compile_definitions(WARN_ON)
 # We have to remove every single ENABLE_ and USE_QT include first.
 # needed for ENABLE_ compatibility
 
-# Exclude the optional modules by default:
+# Exclude the optional modules (ENABLE_xyz and USE_QT) by default:
 set(OPTIONAL_MODULES
     jack
     shmsoundin
@@ -69,15 +69,12 @@ function(filter_optional MODULE_LIST)
             endif()
         endif()
         list(FILTER SOURCE_FILES  EXCLUDE REGEX ".*/${MODULE}\\.cpp$")
-        list(FILTER HEADER_FILES  EXCLUDE REGEX ".*/${MODULE}\\.h$")
         list(FILTER SOURCE_FILES  EXCLUDE REGEX ".*/${MODULE}\\.c$")
     endforeach()
     # push changes to parent scope
     set(SOURCE_FILES ${SOURCE_FILES} PARENT_SCOPE)
-    set(HEADER_FILES ${HEADER_FILES} PARENT_SCOPE)
 endfunction()
 
-file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.h)
 file(GLOB_RECURSE SOURCE_FILES
     CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.cpp
@@ -98,7 +95,6 @@ filter_optional("${OPTIONAL_MODULES}")
 function(filter_gui_files)
     foreach(DIR IN ITEMS "GUI-QT" "main-Qt" "util-QT")
         list(FILTER SOURCE_FILES EXCLUDE REGEX ".*/${DIR}/.*")
-        list(FILTER HEADER_FILES EXCLUDE REGEX ".*/${DIR}/.*")
     endforeach()
 endfunction()
 
@@ -127,7 +123,6 @@ endif()
 
 # If Qt GUI support is enabled, add GUI-specific sources & forms
 set(FORMS "")
-set(GUI_HEADERS "")
 set(GUI_SOURCES "")
 set(RESOURCES "")
 if(USE_QT)
@@ -145,14 +140,6 @@ if(USE_QT)
         "${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.ui"
     )
     list(APPEND FORMS ${FORMS_GLOB})
-
-
-    file(GLOB GUI_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/GUI-QT/*.h")
-    list(REMOVE_ITEM GUI_HEADERS_GLOB
-        "${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.h"
-        "${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.h"
-    )
-    list(APPEND GUI_HEADERS ${GUI_HEADERS_GLOB})
     
     file(GLOB GUI_SOURCES_GLOB
         "${CMAKE_SOURCE_DIR}/src/GUI-QT/*.cpp"
@@ -164,16 +151,10 @@ if(USE_QT)
     )
     list(APPEND GUI_SOURCES ${GUI_SOURCES_GLOB})
     
-    file(GLOB UTIL_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/*.h")
-    list(REMOVE_ITEM UTIL_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/Rig.h")
-    list(APPEND GUI_HEADERS ${UTIL_HEADERS_GLOB})
-    
     file(GLOB UTIL_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/*.cpp")
     list(REMOVE_ITEM UTIL_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/util-QT/Rig.cpp")
     list(APPEND GUI_SOURCES ${UTIL_SOURCES_GLOB})
     
-    file(GLOB MAINQT_HEADERS_GLOB "${CMAKE_SOURCE_DIR}/src/main-Qt/*.h")
-    list(APPEND GUI_HEADERS ${MAINQT_HEADERS_GLOB})
     
     file(GLOB MAINQT_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/main-Qt/*.cpp")
     list(REMOVE_ITEM MAINQT_SOURCES_GLOB "${CMAKE_SOURCE_DIR}/src/main-Qt/main.cpp")
@@ -181,7 +162,6 @@ if(USE_QT)
     
     
     list(APPEND SOURCE_FILES ${GUI_SOURCES})
-    list(APPEND HEADER_FILES ${GUI_HEADERS})
 endif()
 
 if(CONSOLE)
@@ -189,9 +169,7 @@ if(CONSOLE)
     list(REMOVE_ITEM SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp)
     # unix:!cross_compile extras
     if(UNIX AND NOT CROSS_COMPILE)
-        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.h)
         list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.cpp)
-		target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
         message(STATUS "Building with terminal user interface (console)")
     endif()
 endif()
@@ -201,7 +179,6 @@ if(QTCONSOLE)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/main-Qt/main.cpp)
     list(REMOVE_ITEM SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/main.cpp)
     if(UNIX AND NOT CROSS_COMPILE)
-        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.h)
         list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/linux/ConsoleIO.cpp)
         message(STATUS "Building Qt console with terminal user interface")
     endif()
@@ -238,8 +215,7 @@ if(ENABLE_FDK_AAC)
             message(FATAL_ERROR "FDK-AAC requested but library not found")
         endif()
     endif()
-
-    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sourcedecoders/fdk_aac_codec.h)
+    
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sourcedecoders/fdk_aac_codec.cpp)
     message(STATUS "with fdk-aac")
 endif()
@@ -283,16 +259,12 @@ if(ENABLE_HAMLIB)
         list(APPEND EXTRA_LIBS ${HAMLIB_LIBRARIES})
 	endif()
     # Remove in case already present
-    list(REMOVE_ITEM HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.h)
     list(REMOVE_ITEM SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.cpp)
-    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.h)
     list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util/Hamlib.cpp)
     if(USE_QT)
-        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/util-QT/Rig.h)
         list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/util-QT/Rig.cpp)
     endif()
     if(USE_QT)
-        list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.h)
         list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.cpp)
         list(APPEND FORMS ${CMAKE_SOURCE_DIR}/src/GUI-QT/RigDlg.ui)
     endif()
@@ -311,78 +283,12 @@ if(ENABLE_GPS)
     message(STATUS "with gps")
 endif()
 
-if(ENABLE_ALSA)
-    add_compile_definitions(USE_ALSA)
-    list(APPEND HEADER_FILES
-        ${CMAKE_SOURCE_DIR}/src/linux/alsain.h
-        ${CMAKE_SOURCE_DIR}/src/linux/alsaout.h
-        ${CMAKE_SOURCE_DIR}/src/linux/alsacommon.h
-    )
-    list(APPEND SOURCE_FILES
-        ${CMAKE_SOURCE_DIR}/src/linux/alsain.cpp
-        ${CMAKE_SOURCE_DIR}/src/linux/alsaout.cpp
-        ${CMAKE_SOURCE_DIR}/src/linux/alsacommon.cpp
-    )
-    
-	find_package(ALSA)
-	if(ALSA_FOUND)
-        list(APPEND INCLUDE_DIRS ${ALSA_INCLUDE_DIRS})
-        list(APPEND EXTRA_LIBS ${ALSA_LIBRARIES})
-	endif()
-	
-    message(STATUS "with alsa")
-endif()
-
-if(ENABLE_PORTAUDIO)
-    add_compile_definitions(USE_PORTAUDIO)
-    list(APPEND HEADER_FILES
-        ${CMAKE_SOURCE_DIR}/src/sound/pa_ringbuffer.h
-        ${CMAKE_SOURCE_DIR}/src/sound/drm_portaudio.h
-    )
-    list(APPEND SOURCE_FILES
-        ${CMAKE_SOURCE_DIR}/src/sound/drm_portaudio.cpp
-        ${CMAKE_SOURCE_DIR}/src/sound/pa_ringbuffer.c
-    )
-	pkg_check_modules(PORTAUDIO portaudio-2.0)
-
-	if(PORTAUDIO_FOUND)
-        list(APPEND INCLUDE_DIRS ${PORTAUDIO_INCLUDE_DIRS})
-        list(APPEND EXTRA_LIBS ${PORTAUDIO_LIBRARIES})
-	endif()
-    message(STATUS "with portaudio")
-endif()
-
-if(ENABLE_PULSEAUDIO)
-    add_compile_definitions(USE_PULSEAUDIO)
-    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_pulseaudio.h)
-    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_pulseaudio.cpp)
-	pkg_check_modules(PULSE libpulse)
-
-	if(PULSE_FOUND)
-        list(APPEND INCLUDE_DIRS ${PULSE_INCLUDE_DIRS})
-        list(APPEND EXTRA_LIBS ${PULSE_LIBRARIES})
-	endif()
-    message(STATUS "with pulseaudio")
-endif()
-
-if(ENABLE_SOAPYSDR)
-    add_compile_definitions(USE_SOAPYSDR)
-    list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_soapySDR.h)
-    list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/sound/drm_soapySDR.cpp)
-	find_package(SoapySDR)
-
-	if(SoapySDR_FOUND)
-        list(APPEND EXTRA_LIBS SoapySDR::SoapySDR)
-	endif()
-    message(STATUS "with SoapySDR")
-endif()
 
 include_directories(${INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set(ALL_SOURCES ${SOURCE_FILES})
-set(ALL_HEADERS ${HEADER_FILES})
 
 ####################################################################################
 add_executable(${PROJECT_NAME} ${ALL_SOURCES} ${RESOURCES})
@@ -393,6 +299,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 ####################################################################################
 include(cmake/hardening.cmake)
+include(cmake/audiobackends.cmake)
+dream_configure_backend(dream)
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${EXTRA_LIBS})
 
@@ -422,47 +330,34 @@ if(UNIX AND NOT CROSS_COMPILE)
 endif()
 
 # try to find Qt6
-if(USE_QT)
-    if(QT_MAJOR_VERSION STREQUAL "6")
-        find_package(Qt6 COMPONENTS Core Widgets Network Xml Svg WebEngineWidgets Gui REQUIRED QUIET)
-        if(Qt6_FOUND)
-            message(STATUS "Qt6 found")
-            # bugfix
-            # Link required components (some configurations might not need all components; link if found)
-            if(TARGET Qt6::Widgets)
-                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)
-            endif()
-            if(TARGET Qt6::Network)
-                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Network)
-            endif()
-            if(TARGET Qt6::Xml)
-                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Xml)
-            endif()
-            if(TARGET Qt6::Svg)
-                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Svg)
-            endif()
-            if(TARGET Qt6::WebEngineWidgets)
-                # if webenginewidgets available, add BWSViewer UI/sources as in .pro
-                list(APPEND FORMS ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.ui)
-                list(APPEND HEADER_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.h)
-                list(APPEND SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.cpp)
-                target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::WebEngineWidgets)
-                message(STATUS "with BWS (Qt WebEngineWidgets)")
-            endif()
-            # Qt resource & UI handling
-	qt_standard_project_setup()
-
-	qt_add_resources(${PROJECT_NAME} "resources"
-	    PREFIX "/"
-	    FILES ${RESOURCES}
-	)
-# bugfix for linking issue
-	target_sources(${PROJECT_NAME} PRIVATE ${QT_FORMS})
-        endif()
-    else()
-        # Try Qt5
-        message(FATAL_ERROR "Qt6 not found!!!")
+if(USE_QT AND QT_MAJOR_VERSION STREQUAL "6")
+	find_package(Qt6 COMPONENTS Core Widgets Network Xml Svg WebEngineWidgets Gui REQUIRED)
+	
+    if(TARGET Qt6::WebEngineWidgets)
+        list(APPEND FORMS
+            ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.ui
+        )
+        list(APPEND SOURCE_FILES
+            ${CMAKE_SOURCE_DIR}/src/GUI-QT/BWSViewer.cpp
+        )
     endif()
+    qt_standard_project_setup()
+
+    target_link_libraries(dream PRIVATE
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Network
+        Qt6::Xml
+        Qt6::Svg
+    )
+    if(TARGET Qt6::WebEngineWidgets)
+        target_link_libraries(dream PRIVATE Qt6::WebEngineWidgets)
+    endif()
+endif()
+
+if(CONSOLE AND UNIX AND NOT CROSS_COMPILE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
 endif()
 
 if(UNIX)
@@ -492,18 +387,6 @@ if(ENABLE_HARDENING)
     message(STATUS "Hardening enabled")
 endif()
 
-if(NOT ENABLE_PULSEAUDIO AND NOT ENABLE_PORTAUDIO AND NOT ENABLE_ALSA AND NOT ENABLE_SOAPYSDR)
-    message(WARNING "No usable audio interface configured (pulseaudio/portaudio/alsa/SoapySDR). Set ENABLE_PULSEAUDIO or ENABLE_PORTAUDIO or ENABLE_ALSA or ENABLE_SOAPYSDR.")
-    # In the original .pro an error() would stop qmake
-    # might be importart if only soapySDR is used (TODO!)
-    #message(FATAL_ERROR "no usable audio interface found - install pulseaudio or portaudio dev package")
-endif()
-if(ENABLE_SOAPYSDR)
-     message(WARNING "ENABLE_SOAPYSDR detected, expect runtime bugs.")
-endif()
-if(ENABLE_JACK)
-     message(WARNING "ENABLE_JACK detected, JACK isn't supported currently, it probably won't run / compile at all.")
-endif()
 
 set(DREAM_INCLUDE_DIRS ${INCLUDE_DIRS} CACHE INTERNAL "dream include dirs")
 set(DREAM_EXTRA_LIBS ${EXTRA_LIBS} CACHE INTERNAL "dream extra libs")
