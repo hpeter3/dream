@@ -43,7 +43,9 @@ class CSoundOutAlsa : public CSoundOutInterface
 {
 public:
     CSoundOutAlsa();
-    virtual ~CSoundOutAlsa() {}
+    virtual ~CSoundOutAlsa() {
+        Close();
+    }
 
     virtual void Enumerate(std::vector<std::string>&, std::vector<std::string>&, std::string&);
     virtual void SetDev(std::string sNewDevice);
@@ -63,7 +65,10 @@ protected:
     class CPlayThread : public CThread
     {
     public:
-        virtual ~CPlayThread() {}
+        virtual ~CPlayThread() {
+            SoundBuf.keep_running = false; 
+            wait();
+        }
         virtual void run();
         CSoundBuf SoundBuf;
         CSoundOutAlsa*  pSoundOut;
