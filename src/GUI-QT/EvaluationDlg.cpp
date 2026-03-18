@@ -25,20 +25,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
 \******************************************************************************/
-//DEBUG2025v2
-#include <ctime>
-#include <gps.h>
-#ifndef MODE_2D
-#define MODE_2D 2
-#endif
-inline bool gps_has_fix(const gps_data_t &g) {
-    return (g.fix.mode >= MODE_2D);
-}
 
 #include "EvaluationDlg.h"
 #include "DialogUtil.h"
 #ifdef HAVE_LIBHAMLIB
-#include "../util-QT/Rig.h"
+# include "../util-QT/Rig.h"
 #endif
 #include <QMessageBox>
 #include <QLayout>
@@ -763,14 +754,15 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
     if((gps.set&STATUS_SET)==0) {
         LEDGPS->SetLight(CMultColorLED::RL_RED);
     } else {
-        LEDGPS->SetLight(CMultColorLED::RL_GREEN);
-        //DEBUG2025 struct gps_data_t has no member named status -> might fix it later
-        /*if(gps.status==0)
-            LEDGPS->SetLight(CMultColorLED::RL_YELLOW);
-        else
-            LEDGPS->SetLight(CMultColorLED::RL_GREEN);*/
-        //DEBUG2025v2 temporary fix
-        if (!gps_has_fix(gps))
+        //Fix for: struct gps_data_t has no member named status
+        int check_gps_status;
+
+        #if defined(GPSD_API_MAJOR_VERSION) && GPSD_API_MAJOR_VERSION >= 10
+                check_gps_status = gps.fix.status;
+        #else
+                check_gps_status = gps.status;
+        #endif
+        if (check_gps_status == STATUS_NO_FIX)
             LEDGPS->SetLight(CMultColorLED::RL_YELLOW);
         else
             LEDGPS->SetLight(CMultColorLED::RL_GREEN);
@@ -800,15 +792,20 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
     else
         qStrTrack =  tr("  Track: ?");
     QString qStrTime;
-        //DEBUG2025
-        //invalid cast from timespec_t (which is a struct) to time_t (which is a long int)
+
+        //fix for: invalid cast from timespec_t (which is a struct) to time_t (which is a long int)
     if (gps.set&TIME_SET)
     {
         qStrTime = "UTC: ?";
         QString qStrSat;
         struct tm * p_ts;
 
-        time_t tt = static_cast<time_t>(gps.fix.time.tv_sec);
+        time_t tt;
+        #if defined(GPSD_API_MAJOR_VERSION) && GPSD_API_MAJOR_VERSION >= 10
+                tt = gps.fix.time.tv_sec;   // timespec -> seconds
+        #else
+                tt = gps.fix.time;          // old: time_t
+        #endif
         p_ts = gmtime(&tt);
         QChar fill('0');
         qStrTime = QString("UTC: %1/%2/%3 %4:%5:%6  ")
@@ -820,7 +817,7 @@ void systemevalDlg::UpdateGPS(CParameter& Parameters)
                 .arg(p_ts->tm_sec,2, 10, fill);
     }
 
-    //else
+    else
 	qStrTime = "UTC: ?";
     QString qStrSat;
     if (gps.set&SATELLITE_SET)

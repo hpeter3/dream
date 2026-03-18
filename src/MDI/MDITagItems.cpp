@@ -1066,14 +1066,22 @@ CTagItemGeneratorGPS::GenTag(bool bIsValid, gps_data_t& gps_data)	// Long/Lat in
 	{
 		uint32_t source = 0xff; // GPS_SOURCE_NOT_AVAILABLE
 		PrepareTag(26 * SIZEOF__BYTE);
-		//DEBUG2025 struct gps_data_t has no member name status -> will fix later
-		/*if(gps_data.set&STATUS_SET) {
-            switch(gps_data.status) {
+        //Fix for: struct gps_data_t has no member name status
+        int check_gps_status;
+
+        #if defined(GPSD_API_MAJOR_VERSION) && GPSD_API_MAJOR_VERSION >= 10
+                check_gps_status = gps_data.fix.status;
+        #else
+                check_gps_status = gps_data.status;
+        #endif
+
+        if(gps_data.set&STATUS_SET) {
+            switch(check_gps_status) {
 			case 0: source = 3; break; // manual
 			case 1: source = 1; break; // gps
 			case 2: source = 2; break; // differential
 			}
-		}*/
+        }
 		Enqueue(source, SIZEOF__BYTE);
 
 		if (gps_data.set&SATELLITE_SET)
@@ -1160,11 +1168,16 @@ CTagItemGeneratorGPS::GenTag(bool bIsValid, gps_data_t& gps_data)	// Long/Lat in
 			Enqueue((uint32_t) 0xff, SIZEOF__BYTE);
 		}
 
-		//DEBUG2025: invalid cast from timespec (struct) to time_t (long int) -> might fix later
-		/*if (gps_data.set&TIME_SET)
+        //Fix for: invalid cast from timespec (struct) to time_t (long int)
+        if (gps_data.set&TIME_SET)
 		{
 
-            time_t time = (time_t) gps_data.fix.time;
+            time_t time;
+            #if defined(GPSD_API_MAJOR_VERSION) && GPSD_API_MAJOR_VERSION >= 10
+                        time = gps_data.fix.time.tv_sec;
+            #else
+                        time = gps_data.fix.time;        // old gpsd API
+            #endif
 			struct tm * ptm;
 			ptm = gmtime ( &time );
 			Enqueue((uint32_t) ptm->tm_hour, SIZEOF__BYTE);
@@ -1173,10 +1186,8 @@ CTagItemGeneratorGPS::GenTag(bool bIsValid, gps_data_t& gps_data)	// Long/Lat in
 			Enqueue(1900+ptm->tm_year, 2*SIZEOF__BYTE);
 			Enqueue((uint32_t) ptm->tm_mon+1, SIZEOF__BYTE);
 			Enqueue((uint32_t) ptm->tm_mday, SIZEOF__BYTE);
-		}*/
-		//DEBUG2025: change this if to else when the timespec error is fixed
-		//remove the inside of the if statement too
-		if(!gps_data.set&TIME_SET)
+        }
+        else
 		{
 			Enqueue((uint32_t) 0xff, SIZEOF__BYTE);
 			Enqueue((uint32_t) 0xff, SIZEOF__BYTE);
