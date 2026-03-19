@@ -1,3 +1,5 @@
+# IMPORTANT
+# MOVED TO: https://github.com/Drm-tools/dream  (qt6 branch)!
 
 # dream-qt6
 
@@ -140,3 +142,4 @@ cd ..
 - Compile-time errors related to Qwt on Debian 13 (use libqwt version 6.3 or later, it's in the experimental repos)
 - If you encounter problems with SoapySDR, please open a new issue with full logs and outputs from the environment you're using (e.g. your terminal)
 - Sometimes Dream crashes when changing the signal source or sink. If this happens, try pavucontrol.
+
