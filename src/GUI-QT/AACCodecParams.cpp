@@ -6,7 +6,7 @@
  *  David Flamand
  *
  * Description:
- *  Opus Codec Parameters Dialog
+ *  AAC Codec Parameters Dialog
  *
  ******************************************************************************
  *
@@ -91,8 +91,11 @@ AACCodecParams::AACCodecParams(CSettings& Settings, CParameter& Parameters,
 	Parameters.Unlock();
 
 	/* Connections */
-    connect(ButtonGroupChannels, SIGNAL(buttonClicked(int)), this, SLOT(OnButtonGroupChannels(int)));
-    connect(ButtonGroupSampleRate, SIGNAL(buttonClicked(int)),		this, SLOT(OnButtonGroupSampleRate(int)));
+connect(ButtonGroupChannels, &QButtonGroup::idClicked,
+        this, &AACCodecParams::OnButtonGroupChannels);
+
+connect(ButtonGroupSampleRate, &QButtonGroup::idClicked,
+        this, &AACCodecParams::OnButtonGroupSampleRate);
     connect(CheckBoxSBR, SIGNAL(toggled(bool)),		this, SLOT(OnCheckBoxSBR(bool)));
 
     ButtonGroupChannels->addButton(RadioButtonChannelsMono, CAudioParam::AM_MONO);

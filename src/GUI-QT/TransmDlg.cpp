@@ -313,7 +313,7 @@ TransmDialog::TransmDialog(CTx& ntx, QWidget* parent)
 	{
 	case CAudioParam::AC_AAC:
 		RadioButtonAAC->setChecked(true);
-        ShowButtonCodec(false, 1);
+        ShowButtonCodec(true, 1);
 		break;
 
 	case CAudioParam::AC_OPUS:
@@ -1351,7 +1351,7 @@ void TransmDialog::OnRadioCodec(int iID)
 	{
 	case 0:
 		eNewAudioCoding = CAudioParam::AC_AAC;
-        ShowButtonCodec(false, 1);
+        ShowButtonCodec(true, 1);
 		break;
 
 	case 1:
